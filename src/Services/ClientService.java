@@ -20,11 +20,9 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
+
     public Optional<Client> findById(Long id){
         return clientRepository.findById(id);
-    }
-    public Optional<Client> findByName(String name){
-        return clientRepository.findByName(name);
     }
     public List<Client> findAll(){
         return clientRepository.findAll();
@@ -35,4 +33,14 @@ public class ClientService {
     public Boolean delete(Long id) {
         return clientRepository.delete(id);
     }
+    public Optional<Client> findByName(String name) {
+        Optional<Client> client = clientRepository.findByName(name);
+
+        if (client.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return client;
+        }
+    }
+
 }
