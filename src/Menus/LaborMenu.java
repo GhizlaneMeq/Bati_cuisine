@@ -40,6 +40,7 @@ public class LaborMenu {
 
                 System.out.println("Main-d'œuvre ajoutée avec succès.");
 
+
                 System.out.print("Voulez-vous ajouter un autre type de main-d'œuvre ? (y/n): ");
                 String addMore = scanner.nextLine().trim().toLowerCase();
                 addingLabor = addMore.equals("y");
