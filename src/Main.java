@@ -1,13 +1,15 @@
 import Menus.ClientMenu;
 import Menus.MaterialMenu;
 import Menus.ProjectMenu;
+import Menus.LaborMenu; // Import LaborMenu
 import Repositories.ClientRepository;
+import Repositories.LaborRepository;
 import Repositories.MaterialRepository;
 import Repositories.ProjectRepository;
 import Services.ClientService;
+import Services.LaborService;
 import Services.MaterialService;
 import Services.ProjectService;
-
 
 import java.util.Scanner;
 
@@ -20,19 +22,27 @@ public class Main {
     private static MaterialMenu materialMenu;
     private static ProjectService projectService;
     private static ProjectRepository projectRepository;
-    public static void main(String[] args) {
+    private static LaborRepository laborRepository;
+    private static LaborService laborService;
+    private static LaborMenu laborMenu;
 
+    public static void main(String[] args) {
         clientRepository = new ClientRepository();
-        clientService =new ClientService(clientRepository) ;
+        clientService = new ClientService(clientRepository);
         materialRepository = new MaterialRepository();
         materialService = new MaterialService(materialRepository);
-        materialMenu =new MaterialMenu(materialService);
+        materialMenu = new MaterialMenu(materialService);
         clientMenu = new ClientMenu(clientService);
         projectRepository = new ProjectRepository();
         projectService = new ProjectService(projectRepository);
+        laborRepository = new LaborRepository();
+        laborService = new LaborService(laborRepository);
+        laborMenu = new LaborMenu(laborService);
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
+
         System.out.println("=== Bienvenue dans l'application de gestion des projets de rénovation de cuisines ===");
+
         while (isRunning) {
             System.out.println("=== Menu Principal ===");
             System.out.println("1. Créer un nouveau projet");
@@ -49,10 +59,10 @@ public class Main {
                     createProject(scanner);
                     break;
                 case 2:
-                   // displayExistingProjects();
+                    // displayExistingProjects();
                     break;
                 case 3:
-                   // calculate();
+                    // calculate();
                     break;
                 case 4:
                     isRunning = false;
@@ -68,10 +78,7 @@ public class Main {
     }
 
     private static void createProject(Scanner scanner) {
-
-
-
-        ProjectMenu projectMenu = new ProjectMenu(projectService,clientMenu,materialMenu);
+        ProjectMenu projectMenu = new ProjectMenu(projectService, clientMenu, materialMenu, laborMenu);
         projectMenu.manageClient(scanner);
     }
 }
