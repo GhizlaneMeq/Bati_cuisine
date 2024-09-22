@@ -1,18 +1,26 @@
 package Menus;
 
 import Entities.Client;
+import Entities.Enum.ProjectStatus;
+import Entities.Project;
 import Services.ClientService;
+import Services.ProjectService;
 
 import java.util.Optional;
 import java.util.Scanner;
 
 public class ProjectMenu {
-    private ClientService clientService;
     private  ClientMenu clientMenu ;
-    public ProjectMenu(ClientService clientService) {
-        this.clientService = clientService;
-        this.clientMenu = new ClientMenu(clientService);
+     private  MaterialMenu materialMenu;
+     private ProjectService projectService;
+
+    public ProjectMenu(ProjectService projectService,ClientMenu clientMenu, MaterialMenu materialMenu) {
+        this.clientMenu = clientMenu;
+        this.materialMenu = materialMenu;
+        this.projectService = projectService;
     }
+
+
 
     public void manageClient(Scanner scanner){
         System.out.println("--- Gestion des clients ---");
@@ -38,25 +46,32 @@ public class ProjectMenu {
     }
 
     private void SearchClient(Scanner scanner) {
-        System.out.println("\n--- Recherche d'un client existant ---");
-        System.out.print("Entrez le nom du client : ");
-        String name = scanner.nextLine();
-
-        try {
-            Optional<Client> client = clientService.findByName(name);
-
-            if (client.isPresent()) {
-                System.out.println("\nClient trouvé :");
-                Client foundClient = client.get();
-                System.out.println("Nom : " + foundClient.getName());
-                System.out.println("Adresse : " + foundClient.getAddress());
-                System.out.println("Numéro de téléphone : " + foundClient.getPhone());
-                System.out.println("Statut professionnel : " + (foundClient.isProfessional() ? "Oui" : "Non"));
+        Optional<Client> client = clientMenu.search();
+        if(client.isPresent()){
+            System.out.print("Souhaitez-vous continuer avec ce client ? (y/n): ");
+            String choiceToContinue = scanner.nextLine().trim().toLowerCase();
+            if (choiceToContinue.equals("y")) {
+                addProject(scanner, client.get());
+            } else if (choiceToContinue.equals("n")) {
+                addNewClient(scanner);
             } else {
-                System.out.println("Aucun client trouvé avec le nom : " + name);
+                System.out.println("Invalid choice. Please enter 'y' or 'n'.");
             }
+        }
+    }
+
+    private void addProject(Scanner scanner,Client client) {
+        try {
+            System.out.println("\n--- Création d'un Nouveau Projet ---");
+            System.out.print("Entrez le nom du projet: ");
+            String name = scanner.nextLine();
+            System.out.print("Entrez la surface de la cuisine (en m²): ");
+            double surface = scanner.nextDouble();
+            scanner.nextLine();
+           Optional<Project> project = projectService.save(new Project(name,0,0, ProjectStatus.InProgress,client));
+            materialMenu.create(project.get());
         } catch (Exception e) {
-            System.out.println("Une erreur s'est produite lors de la recherche du client : " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

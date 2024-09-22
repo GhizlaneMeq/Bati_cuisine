@@ -1,12 +1,35 @@
+import Menus.ClientMenu;
+import Menus.MaterialMenu;
 import Menus.ProjectMenu;
 import Repositories.ClientRepository;
+import Repositories.MaterialRepository;
+import Repositories.ProjectRepository;
 import Services.ClientService;
+import Services.MaterialService;
+import Services.ProjectService;
+
 
 import java.util.Scanner;
 
 public class Main {
+    private static ClientService clientService;
+    private static ClientRepository clientRepository;
+    private static ClientMenu clientMenu;
+    private static MaterialService materialService;
+    private static MaterialRepository materialRepository;
+    private static MaterialMenu materialMenu;
+    private static ProjectService projectService;
+    private static ProjectRepository projectRepository;
     public static void main(String[] args) {
 
+        clientRepository = new ClientRepository();
+        clientService =new ClientService(clientRepository) ;
+        materialRepository = new MaterialRepository();
+        materialService = new MaterialService(materialRepository);
+        materialMenu =new MaterialMenu(materialService);
+        clientMenu = new ClientMenu(clientService);
+        projectRepository = new ProjectRepository();
+        projectService = new ProjectService(projectRepository);
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
         System.out.println("=== Bienvenue dans l'application de gestion des projets de rénovation de cuisines ===");
@@ -45,7 +68,10 @@ public class Main {
     }
 
     private static void createProject(Scanner scanner) {
-        ProjectMenu projectMenu = new ProjectMenu(new ClientService(new ClientRepository()));
+
+
+
+        ProjectMenu projectMenu = new ProjectMenu(projectService,clientMenu,materialMenu);
         projectMenu.manageClient(scanner);
     }
 }

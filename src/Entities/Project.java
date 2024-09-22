@@ -1,6 +1,8 @@
 package Entities;
 
 import Entities.Enum.ProjectStatus;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Project {
@@ -12,13 +14,13 @@ public class Project {
     private Client client;
     private List<Component> components;
 
-    public Project(String name, double profitMargin, double totalCost, ProjectStatus projectStatus, Client client, List<Component> components) {
+    public Project(String name, double profitMargin, double totalCost, ProjectStatus projectStatus, Client client) {
         this.name = name;
         this.profitMargin = profitMargin;
         this.totalCost = totalCost;
         this.projectStatus = projectStatus;
         this.client = client;
-        this.components = components;
+        this.components = new ArrayList<>();
     }
 
     public Long getId() {

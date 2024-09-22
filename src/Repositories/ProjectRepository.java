@@ -20,7 +20,7 @@ public class ProjectRepository implements GenericRepositoryInterface<Project> {
 
     @Override
     public Project save(Project project) {
-        String query = "INSERT INTO projects (name, profitMargin, totalCost, projectStatus, client_id) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        String query = "INSERT INTO projects (name, profitMargin, totalCost, projectStatus, client_id) VALUES (?, ?, ?, ?::project_status, ?) RETURNING id";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, project.getName());
             stmt.setDouble(2, project.getProfitMargin());
@@ -112,6 +112,6 @@ public class ProjectRepository implements GenericRepositoryInterface<Project> {
         ClientRepository clientRepo = new ClientRepository();
         Client client = clientRepo.findById(clientId).orElse(null);
 
-        return new Project(name, profitMargin, totalCost, status, client, null); // components will need separate handling
+        return new Project(name, profitMargin, totalCost, status, client);
     }
 }
