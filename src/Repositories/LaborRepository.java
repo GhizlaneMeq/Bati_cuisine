@@ -45,7 +45,6 @@ public class LaborRepository implements GenericRepositoryInterface<Labor> {
         String query = "SELECT * FROM labor WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setLong(1, id);
-
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return Optional.of(mapResultSetToLabor(rs));
@@ -103,6 +102,21 @@ public class LaborRepository implements GenericRepositoryInterface<Labor> {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<Labor> findByProjectId(Long projectId) {
+        String query = "SELECT * FROM labor WHERE project_id = ?";
+        List<Labor> labors = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, projectId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                labors.add(mapResultSetToLabor(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return labors;
     }
 
     private Labor mapResultSetToLabor(ResultSet rs) throws SQLException {

@@ -35,13 +35,10 @@ public class MaterialMenu {
                 System.out.print("Entrez le coût de transport de ce matériau (€): ");
                 double transportCost = getValidDoubleInput();
 
-                System.out.print("Entrez le taux de TVA : ");
-                double vatRate = getValidDoubleInput();
-
                 System.out.print("Entrez le coefficient de qualité du matériau (1.0 = standard, > 1.0 = haute qualité): ");
                 double qualityCoefficient = getValidDoubleInput();
 
-                Material material = new Material(name, "material", vatRate, project, unitCost, quantity, transportCost, qualityCoefficient);
+                Material material = new Material(name, "material", 0.20, project, unitCost, quantity, transportCost, qualityCoefficient);
                 materialService.save(material);
                 materials.add(material);
 
@@ -55,6 +52,29 @@ public class MaterialMenu {
                 System.out.println("Erreur lors de la création du matériau: " + e.getMessage());
             }
         }
+
+        double[] totals = calculateTotalCost(materials);
+        System.out.printf("Total des coûts sans TVA: %.2f €\n", totals[0]);
+        System.out.printf("Total des coûts avec TVA: %.2f €\n", totals[1]);
+    }
+
+    public double[] calculateTotalCost(List<Material> materials) {
+        double totalWithoutVAT = 0;
+        double totalWithVAT = 0;
+
+        for (Material material : materials) {
+            double baseCost = material.getQuantity() * material.getUnitCost();
+            double transportCost = material.getTransportCost();
+            double qualityCoefficient = material.getQualityCoefficient();
+
+            double totalCostBeforeVAT = (baseCost * qualityCoefficient) + transportCost;
+            double totalCostWithVAT = totalCostBeforeVAT * (1 + material.getVatRate());
+
+            totalWithoutVAT += totalCostBeforeVAT;
+            totalWithVAT += totalCostWithVAT;
+        }
+
+        return new double[]{totalWithoutVAT, totalWithVAT};
     }
 
     private double getValidDoubleInput() {

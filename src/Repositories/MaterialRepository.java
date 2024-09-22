@@ -107,6 +107,21 @@ public class MaterialRepository implements GenericRepositoryInterface<Material> 
         }
     }
 
+    public List<Material> findByProjectId(Long projectId) {
+        String query = "SELECT * FROM materials WHERE project_id = ?";
+        List<Material> materials = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, projectId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                materials.add(mapResultSetToMaterial(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return materials;
+    }
+
     private Material mapResultSetToMaterial(ResultSet rs) throws SQLException {
         Long id = rs.getLong("id");
         String name = rs.getString("name");

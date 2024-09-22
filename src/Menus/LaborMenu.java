@@ -34,12 +34,11 @@ public class LaborMenu {
                 System.out.print("Entrez le facteur de productivité (1.0 = standard, > 1.0 = haute productivité): ");
                 double productivityFactor = getValidDoubleInput();
 
-                Labor labor = new Labor(laborType, "labor", 0.0, project, hourlyRate, hoursWorked, productivityFactor);
+                Labor labor = new Labor(laborType, "labor", 0.20, project, hourlyRate, hoursWorked, productivityFactor);
                 laborService.save(labor);
                 laborEntries.add(labor);
 
                 System.out.println("Main-d'œuvre ajoutée avec succès.");
-
 
                 System.out.print("Voulez-vous ajouter un autre type de main-d'œuvre ? (y/n): ");
                 String addMore = scanner.nextLine().trim().toLowerCase();
@@ -49,6 +48,28 @@ public class LaborMenu {
                 System.out.println("Erreur lors de la création de la main-d'œuvre: " + e.getMessage());
             }
         }
+
+        double[] totals = calculateTotalCost(laborEntries);
+        System.out.printf("Total des coûts de main-d'œuvre sans TVA: %.2f €\n", totals[0]);
+        System.out.printf("Total des coûts de main-d'œuvre avec TVA: %.2f €\n", totals[1]);
+    }
+
+    public double[] calculateTotalCost(List<Labor> laborEntries) {
+        double totalWithoutVAT = 0;
+        double totalWithVAT = 0;
+
+        for (Labor labor : laborEntries) {
+            double baseCost = labor.getHourlyRate() * labor.getHoursWorked();
+            double adjustedCost = baseCost * labor.getWorkerProductivity();
+            double totalCostBeforeVAT = adjustedCost;
+
+            double totalCostWithVAT = totalCostBeforeVAT * (1 + labor.getVatRate());
+
+            totalWithoutVAT += totalCostBeforeVAT;
+            totalWithVAT += totalCostWithVAT;
+        }
+
+        return new double[]{totalWithoutVAT, totalWithVAT};
     }
 
     private double getValidDoubleInput() {

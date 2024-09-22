@@ -1,6 +1,7 @@
 package Services;
 
 import Entities.Labor;
+import Entities.Project;
 import Repositories.LaborRepository;
 
 import java.util.List;
@@ -35,5 +36,9 @@ public class LaborService {
 
     public boolean delete(Long id) {
         return laborRepository.delete(id);
+    }
+
+    public List<Labor> findByProject(Project project) {
+        return laborRepository.findByProjectId(project.getId());
     }
 }

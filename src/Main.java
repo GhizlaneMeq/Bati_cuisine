@@ -2,14 +2,8 @@ import Menus.ClientMenu;
 import Menus.MaterialMenu;
 import Menus.ProjectMenu;
 import Menus.LaborMenu; // Import LaborMenu
-import Repositories.ClientRepository;
-import Repositories.LaborRepository;
-import Repositories.MaterialRepository;
-import Repositories.ProjectRepository;
-import Services.ClientService;
-import Services.LaborService;
-import Services.MaterialService;
-import Services.ProjectService;
+import Repositories.*;
+import Services.*;
 
 import java.util.Scanner;
 
@@ -25,6 +19,8 @@ public class Main {
     private static LaborRepository laborRepository;
     private static LaborService laborService;
     private static LaborMenu laborMenu;
+    private static QuoteService quoteService;
+    private static QuoteRepository quoteRepository;
 
     public static void main(String[] args) {
         clientRepository = new ClientRepository();
@@ -38,6 +34,7 @@ public class Main {
         laborRepository = new LaborRepository();
         laborService = new LaborService(laborRepository);
         laborMenu = new LaborMenu(laborService);
+        quoteService = new QuoteService(quoteRepository);
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
 
@@ -78,7 +75,7 @@ public class Main {
     }
 
     private static void createProject(Scanner scanner) {
-        ProjectMenu projectMenu = new ProjectMenu(projectService, clientMenu, materialMenu, laborMenu);
+        ProjectMenu projectMenu = new ProjectMenu(projectService, clientMenu, materialMenu, laborMenu,materialService,laborService,quoteService);
         projectMenu.manageClient(scanner);
     }
 }
