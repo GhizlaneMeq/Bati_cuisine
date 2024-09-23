@@ -54,4 +54,14 @@ public abstract class Component {
         this.project = project;
     }
 
+    @Override
+    public String toString() {
+        return "Component{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", componentType='" + componentType + '\'' +
+                ", vatRate=" + vatRate +
+                ", project=" + project +
+                '}';
+    }
 }

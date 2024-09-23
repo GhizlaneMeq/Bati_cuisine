@@ -124,9 +124,12 @@ public class Main {
 
 import Menus.MainMenu;
 import Menus.ManageClient; // Import your ManageClient class
+import Menus.ManageMaterial;
 import Repositories.ClientRepository;
+import Repositories.MaterialRepository;
 import Repositories.ProjectRepository;
 import Services.ClientService;
+import Services.MaterialService;
 import Services.ProjectService;
 /*import Menus.ManageComponents; // Import your ManageComponents class
 import Menus.ManageProject; // Import your ManageProject class
@@ -140,13 +143,18 @@ public class Main {
     private static ProjectService projectService;
     private static ClientRepository clientRepository;
     private static ProjectRepository projectRepository;
+    private static MaterialService materialService;
+    private static MaterialRepository materialRepository;
     public static void main(String[] args) {
         clientRepository = new ClientRepository();
         projectRepository = new ProjectRepository();
+        materialRepository = new MaterialRepository();
         projectService = new ProjectService(projectRepository);
         clientService = new ClientService(clientRepository,projectService);
+        materialService = new MaterialService(materialRepository);
         // Create instances of the management classes
         ManageClient manageClient = new ManageClient(clientService);
+        ManageMaterial manageMaterial = new ManageMaterial(materialService,projectService);
         /*ManageComponents manageComponents = new ManageComponents();
         ManageProject manageProject = new ManageProject();
         ManageQuotes manageQuotes = new ManageQuotes();
@@ -154,7 +162,7 @@ public class Main {
          */
 
         // Create the main menu with the management class instances
-        MainMenu mainMenu = new MainMenu(manageClient /*,manageComponents, manageProject, manageQuotes*/);
+        MainMenu mainMenu = new MainMenu(manageClient ,manageMaterial/*,manageComponents, manageProject, manageQuotes*/);
         mainMenu.displayMainMenu();
     }
 }

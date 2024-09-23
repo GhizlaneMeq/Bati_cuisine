@@ -122,6 +122,21 @@ public class MaterialRepository implements GenericRepositoryInterface<Material> 
         return materials;
     }
 
+    public List<Material> findByName(String name) {
+        String query = "SELECT * FROM materials WHERE name LIKE ?";
+        List<Material> materials = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, "%" + name + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                materials.add(mapResultSetToMaterial(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return materials;
+    }
+
     private Material mapResultSetToMaterial(ResultSet rs) throws SQLException {
         Long id = rs.getLong("id");
         String name = rs.getString("name");

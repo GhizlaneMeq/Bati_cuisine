@@ -23,6 +23,12 @@ public class Project {
         this.components = new ArrayList<>();
     }
 
+    public Project(Long projectId) {
+    }
+
+    public Project(Long id, String name, double newTotalCost, ProjectStatus projectStatus, Client client) {
+    }
+
     public Long getId() {
         return id;
     }
@@ -79,6 +85,13 @@ public class Project {
         this.components = components;
     }
 
+    public void addComponent(Component component) {
+        components.add(component);
+    }
+
+    public void removeComponent(Component component) {
+        components.remove(component);
+    }
 
     @Override
     public String toString() {

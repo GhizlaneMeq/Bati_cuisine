@@ -55,4 +55,15 @@ public class Material extends Component {
     public void setQualityCoefficient(double qualityCoefficient) {
         this.qualityCoefficient = qualityCoefficient;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "Material{" +
+                "id=" + id +
+                ", unitCost=" + unitCost +
+                ", quantity=" + quantity +
+                ", transportCost=" + transportCost +
+                ", qualityCoefficient=" + qualityCoefficient +
+                '}';
+    }
 }
