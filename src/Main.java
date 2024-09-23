@@ -1,4 +1,4 @@
-import Entities.Project;
+/*import Entities.Project;
 import Menus.ClientMenu;
 import Menus.MaterialMenu;
 import Menus.ProjectMenu;
@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    // ANSI escape codes for colors
     public static final String RESET = "\u001B[0m";
     public static final String RED = "\u001B[31m";
     public static final String GREEN = "\u001B[32m";
@@ -51,7 +50,6 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
 
-        // Header
         System.out.println(BOLD + BLUE + "=================================================" + RESET);
         System.out.println(BOLD + YELLOW + "=== Bienvenue dans l'application de gestion ===" + RESET);
         System.out.println(BOLD + YELLOW + "=== des projets de rénovation de cuisines ===" + RESET);
@@ -68,7 +66,7 @@ public class Main {
             System.out.print(YELLOW + BOLD + "Veuillez choisir une option : " + RESET);
 
             int mainChoice = scanner.nextInt();
-            scanner.nextLine(); 
+            scanner.nextLine();
 
             switch (mainChoice) {
                 case 1:
@@ -121,3 +119,44 @@ public class Main {
         projectMenu.manageClient(scanner);
     }
 }
+
+ */
+
+import Menus.MainMenu;
+import Menus.ManageClient; // Import your ManageClient class
+import Repositories.ClientRepository;
+import Repositories.ProjectRepository;
+import Services.ClientService;
+import Services.ProjectService;
+/*import Menus.ManageComponents; // Import your ManageComponents class
+import Menus.ManageProject; // Import your ManageProject class
+import Menus.ManageQuotes; // Import your ManageQuotes class
+
+
+ */
+
+public class Main {
+    private static ClientService clientService;
+    private static ProjectService projectService;
+    private static ClientRepository clientRepository;
+    private static ProjectRepository projectRepository;
+    public static void main(String[] args) {
+        clientRepository = new ClientRepository();
+        projectRepository = new ProjectRepository();
+        projectService = new ProjectService(projectRepository);
+        clientService = new ClientService(clientRepository,projectService);
+        // Create instances of the management classes
+        ManageClient manageClient = new ManageClient(clientService);
+        /*ManageComponents manageComponents = new ManageComponents();
+        ManageProject manageProject = new ManageProject();
+        ManageQuotes manageQuotes = new ManageQuotes();
+
+         */
+
+        // Create the main menu with the management class instances
+        MainMenu mainMenu = new MainMenu(manageClient /*,manageComponents, manageProject, manageQuotes*/);
+        mainMenu.displayMainMenu();
+    }
+}
+
+

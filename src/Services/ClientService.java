@@ -1,6 +1,7 @@
 package Services;
 
 import Entities.Client;
+import Entities.Project;
 import Repositories.ClientRepository;
 
 import java.util.List;
@@ -8,8 +9,11 @@ import java.util.Optional;
 
 public class ClientService {
     private ClientRepository clientRepository;
-    public ClientService(ClientRepository clientRepository){
+    private ProjectService projectService;
+
+    public ClientService(ClientRepository clientRepository, ProjectService projectService) {
         this.clientRepository = clientRepository;
+        this.projectService = projectService;
     }
 
     public Client save(Client client){
@@ -42,5 +46,9 @@ public class ClientService {
             return client;
         }
     }
+    public List<Project> findProjectsByClient(Client client) {
+        return projectService.findByClient(client.getId());
+    }
+
 
 }

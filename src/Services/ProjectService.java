@@ -44,4 +44,7 @@ public class ProjectService {
     public boolean delete(Long id) {
         return projectRepository.delete(id);
     }
+    public List<Project> findByClient(Long clientId) {
+        return projectRepository.findProjectsByClient(clientId);
+    }
 }
