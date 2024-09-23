@@ -14,18 +14,14 @@ public class ProjectMenu {
     private MaterialMenu materialMenu;
     private LaborMenu laborMenu;
     private ProjectService projectService;
-    private MaterialService materialService;
-    private LaborService laborService;
     private QuoteService quoteService;
 
     public ProjectMenu(ProjectService projectService, ClientMenu clientMenu, MaterialMenu materialMenu, LaborMenu laborMenu,
-                       MaterialService materialService, LaborService laborService, QuoteService quoteService) {
+                       QuoteService quoteService) {
         this.clientMenu = clientMenu;
         this.materialMenu = materialMenu;
         this.laborMenu = laborMenu;
         this.projectService = projectService;
-        this.materialService = materialService;
-        this.laborService = laborService;
         this.quoteService = quoteService;
     }
 
@@ -78,37 +74,24 @@ public class ProjectMenu {
             System.out.println("\n--- Création d'un Nouveau Projet ---");
             System.out.print("Entrez le nom du projet: ");
             String name = scanner.nextLine();
-            System.out.print("Entrez la surface de la cuisine (en m²): ");
-            double surface = scanner.nextDouble();
+
+            double marginProfit =0.0;
             scanner.nextLine();
 
-            Project project = new Project(name, surface, 0, ProjectStatus.InProgress, client);
+            Project project = new Project(name, marginProfit , 0, ProjectStatus.InProgress, client);
             Optional<Project> savedProject = projectService.save(project);
 
             materialMenu.create(savedProject.get());
             laborMenu.create(savedProject.get());
 
-            calculateTotalCost(scanner, savedProject.get());
+          calculateTotalCost(scanner, savedProject.get());
 
         } catch (Exception e) {
             System.out.println("Erreur lors de la création du projet: " + e.getMessage());
         }
     }
 
-    public void addNewClient(Scanner scanner) {
-        clientMenu.create();
-    }
-
     private void calculateTotalCost(Scanner scanner, Project project) {
-        System.out.print("Souhaitez-vous appliquer une TVA au projet ? (y/n) : ");
-        String applyVAT = scanner.nextLine().trim().toLowerCase();
-        double vatRate = 0;
-        if (applyVAT.equals("y")) {
-            System.out.print("Entrez le pourcentage de TVA (%) : ");
-            vatRate = scanner.nextDouble() / 100;
-            scanner.nextLine();
-        }
-
         System.out.print("Souhaitez-vous appliquer une marge bénéficiaire au projet ? (y/n) : ");
         String applyMargin = scanner.nextLine().trim().toLowerCase();
         double marginRate = 0;
@@ -118,26 +101,20 @@ public class ProjectMenu {
             scanner.nextLine();
         }
 
-        double[] totals = laborMenu.calculateTotalCost(laborService.findByProject(project));
-        double totalLabor = totals[0];
-        double totalLaborWithVAT = totals[1];
+        double[] totals = projectService.calculateTotalCost(project, marginRate);
 
-        totals = materialMenu.calculateTotalCost(materialService.findByProject(project));
-        double totalMaterials = totals[0];
-        double totalMaterialsWithVAT = totals[1];
+        System.out.printf("Coût total avant marge : %.2f €\n", totals[1]);
+        System.out.printf("Marge bénéficiaire (%.2f%%) : %.2f €\n", marginRate * 100, totals[2]);
+        System.out.printf("Coût total final du projet : %.2f €\n", totals[3]);
 
-        double totalCostBeforeVAT = totalLaborWithVAT + totalMaterialsWithVAT;
-        double totalCostAfterVAT = totalCostBeforeVAT * (1 + vatRate);
+        project.setProfitMargin(marginRate * 100);
+        project.setTotalCost(totals[1]);
 
-        double totalWithMargin = totalCostBeforeVAT * marginRate;
-        projectService.update(new Project(project.getName(), totalWithMargin, totalCostBeforeVAT + totalWithMargin, project.getProjectStatus(), project.getClient()));
+        projectService.update(project);
 
-        System.out.printf("Coût total avant marge : %.2f €\n", totalCostBeforeVAT);
-        System.out.printf("Marge bénéficiaire (%.2f%%) : %.2f €\n", marginRate * 100, totalWithMargin);
-        System.out.printf("Coût total final du projet : %.2f €\n", totalCostBeforeVAT + totalWithMargin);
-
-        saveQuote(scanner, project, totalCostBeforeVAT + totalWithMargin);
+        saveQuote(scanner, project, totals[3]);
     }
+
 
     private void saveQuote(Scanner scanner, Project project, double total) {
         System.out.println("--- Enregistrement du Devis ---");
@@ -153,5 +130,10 @@ public class ProjectMenu {
         quoteService.save(new Quote(total, issueDate, validityDate, false, project));
         System.out.printf("Devis enregistré :\nMontant estimé : %.2f €\nDate d'émission : %s\nDate de validité : %s\n",
                 total, issueDate.format(formatter), validityDate.format(formatter));
+    }
+
+
+    public void addNewClient(Scanner scanner) {
+        clientMenu.create();
     }
 }

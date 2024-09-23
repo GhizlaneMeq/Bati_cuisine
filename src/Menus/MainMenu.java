@@ -4,18 +4,16 @@ import java.util.Scanner;
 
 public class MainMenu {
     private ManageClient manageClient;
-    private ManageMaterial manageMaterial; // Assuming you have a ManageComponents class
-   /* private ManageProject manageProject; // Assuming you have a ManageProject class
-    private ManageQuotes manageQuotes; // Assuming you have a ManageQuotes class
+    private ManageMaterial manageMaterial;
+   private ManageProject manageProject;
+    //private ManageQuotes manageQuotes;
 
-    */
-
-    public MainMenu(ManageClient manageClient, ManageMaterial manageMaterial
-                    /*ManageProject manageProject, ManageQuotes manageQuotes*/) {
+    public MainMenu(ManageClient manageClient, ManageMaterial manageMaterial,
+            ManageProject manageProject/*, ManageQuotes manageQuotes*/) {
         this.manageClient = manageClient;
         this.manageMaterial = manageMaterial;
-        /*this.manageProject = manageProject;
-        this.manageQuotes = manageQuotes;
+        this.manageProject = manageProject;
+       /* this.manageQuotes = manageQuotes;
 
          */
     }
@@ -92,7 +90,7 @@ public class MainMenu {
                     manageMaterials();
                     break;
                 case 2:
-                    manageLabor(); // Implement this method in ManageComponents
+                    manageLabor();
                     break;
                 case 3:
                     running = false;
@@ -112,6 +110,6 @@ public class MainMenu {
     }
 
     private void manageProjects() {
-      //  manageProject.manageProjects(); // Implement this method in ManageProject
+      manageProject.manageProjects();
     }
 }

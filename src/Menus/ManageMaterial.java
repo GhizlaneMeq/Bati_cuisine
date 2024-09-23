@@ -186,7 +186,7 @@ public class ManageMaterial {
 
     private void updateProjectCosts(Project project) {
         // Logic to calculate and update project costs
-        double[] totals = materialService.calculateTotalCost(materialService.findByProject(project));
+        double[] totals = materialService.calculateTotalCost(project);
         double totalMaterials = totals[0];
         double totalMaterialsWithVAT = totals[1];
 

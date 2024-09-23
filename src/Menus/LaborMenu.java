@@ -49,27 +49,10 @@ public class LaborMenu {
             }
         }
 
-        double[] totals = calculateTotalCost(laborEntries);
+        // Total costs calculated via LaborService
+        double[] totals = laborService.calculateTotalCost(project);
         System.out.printf("Total des coûts de main-d'œuvre sans TVA: %.2f €\n", totals[0]);
         System.out.printf("Total des coûts de main-d'œuvre avec TVA: %.2f €\n", totals[1]);
-    }
-
-    public double[] calculateTotalCost(List<Labor> laborEntries) {
-        double totalWithoutVAT = 0;
-        double totalWithVAT = 0;
-
-        for (Labor labor : laborEntries) {
-            double baseCost = labor.getHourlyRate() * labor.getHoursWorked();
-            double adjustedCost = baseCost * labor.getWorkerProductivity();
-            double totalCostBeforeVAT = adjustedCost;
-
-            double totalCostWithVAT = totalCostBeforeVAT * (1 + labor.getVatRate());
-
-            totalWithoutVAT += totalCostBeforeVAT;
-            totalWithVAT += totalCostWithVAT;
-        }
-
-        return new double[]{totalWithoutVAT, totalWithVAT};
     }
 
     private double getValidDoubleInput() {

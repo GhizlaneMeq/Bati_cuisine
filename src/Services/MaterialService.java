@@ -54,7 +54,8 @@ public class MaterialService {
         return materialRepository.delete(id);
     }
 
-    public double[] calculateTotalCost(List<Material> materials) {
+    public double[] calculateTotalCost(Project project) {
+        List<Material> materials = findByProject(project);
         double totalWithoutVAT = 0;
         double totalWithVAT = 0;
 

@@ -53,28 +53,10 @@ public class MaterialMenu {
             }
         }
 
-        double[] totals = calculateTotalCost(materials);
+        // Total costs calculated via MaterialService
+        double[] totals = materialService.calculateTotalCost(project);
         System.out.printf("Total des coûts sans TVA: %.2f €\n", totals[0]);
         System.out.printf("Total des coûts avec TVA: %.2f €\n", totals[1]);
-    }
-
-    public double[] calculateTotalCost(List<Material> materials) {
-        double totalWithoutVAT = 0;
-        double totalWithVAT = 0;
-
-        for (Material material : materials) {
-            double baseCost = material.getQuantity() * material.getUnitCost();
-            double transportCost = material.getTransportCost();
-            double qualityCoefficient = material.getQualityCoefficient();
-
-            double totalCostBeforeVAT = (baseCost * qualityCoefficient) + transportCost;
-            double totalCostWithVAT = totalCostBeforeVAT * (1 + material.getVatRate());
-
-            totalWithoutVAT += totalCostBeforeVAT;
-            totalWithVAT += totalCostWithVAT;
-        }
-
-        return new double[]{totalWithoutVAT, totalWithVAT};
     }
 
     private double getValidDoubleInput() {

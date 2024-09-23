@@ -73,7 +73,7 @@ public class ProjectRepository implements GenericRepositoryInterface<Project> {
 
     @Override
     public Project update(Project project) {
-        String query = "UPDATE projects SET name = ?, profitMargin = ?, totalCost = ?, projectStatus = ?, client_id = ? WHERE id = ?";
+        String query = "UPDATE projects SET name = ?, profitMargin = ?, totalCost = ?, projectStatus = ?::project_status, client_id = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, project.getName());
             stmt.setDouble(2, project.getProfitMargin());

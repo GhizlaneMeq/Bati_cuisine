@@ -1,4 +1,5 @@
-/*import Entities.Project;
+/*
+import Entities.Project;
 import Menus.ClientMenu;
 import Menus.MaterialMenu;
 import Menus.ProjectMenu;
@@ -36,17 +37,21 @@ public class Main {
 
     public static void main(String[] args) {
         clientRepository = new ClientRepository();
-        clientService = new ClientService(clientRepository);
         materialRepository = new MaterialRepository();
-        materialService = new MaterialService(materialRepository);
-        materialMenu = new MaterialMenu(materialService);
-        clientMenu = new ClientMenu(clientService);
         projectRepository = new ProjectRepository();
-        projectService = new ProjectService(projectRepository);
         laborRepository = new LaborRepository();
+        quoteRepository = new QuoteRepository();
+
         laborService = new LaborService(laborRepository);
-        laborMenu = new LaborMenu(laborService);
+        materialService = new MaterialService(materialRepository);
+        projectService = new ProjectService(materialService, laborService, projectRepository);
+        clientService = new ClientService(clientRepository, projectService);
         quoteService = new QuoteService(quoteRepository);
+
+        clientMenu = new ClientMenu(clientService);
+        materialMenu = new MaterialMenu(materialService);
+        laborMenu = new LaborMenu(laborService);
+
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
 
@@ -56,7 +61,6 @@ public class Main {
         System.out.println(BOLD + BLUE + "=================================================\n" + RESET);
 
         while (isRunning) {
-            // Main Menu
             System.out.println(GREEN + BOLD + "========== Menu Principal ==========" + RESET);
             System.out.println(CYAN + "| 1. Créer un nouveau projet        |" + RESET);
             System.out.println(CYAN + "| 2. Afficher les projets existants |" + RESET);
@@ -115,28 +119,35 @@ public class Main {
     }
 
     private static void createProject(Scanner scanner) {
-        ProjectMenu projectMenu = new ProjectMenu(projectService, clientMenu, materialMenu, laborMenu, materialService, laborService, quoteService);
+        ProjectMenu projectMenu = new ProjectMenu(projectService, clientMenu, materialMenu, laborMenu, quoteService);
         projectMenu.manageClient(scanner);
     }
 }
 
+
+
+
  */
+
+
+
 
 import Menus.MainMenu;
 import Menus.ManageClient; // Import your ManageClient class
 import Menus.ManageMaterial;
+import Menus.ManageProject;
 import Repositories.ClientRepository;
+import Repositories.LaborRepository;
 import Repositories.MaterialRepository;
 import Repositories.ProjectRepository;
 import Services.ClientService;
+import Services.LaborService;
 import Services.MaterialService;
 import Services.ProjectService;
-/*import Menus.ManageComponents; // Import your ManageComponents class
-import Menus.ManageProject; // Import your ManageProject class
-import Menus.ManageQuotes; // Import your ManageQuotes class
 
 
- */
+
+
 
 public class Main {
     private static ClientService clientService;
@@ -149,22 +160,22 @@ public class Main {
         clientRepository = new ClientRepository();
         projectRepository = new ProjectRepository();
         materialRepository = new MaterialRepository();
-        projectService = new ProjectService(projectRepository);
         clientService = new ClientService(clientRepository,projectService);
         materialService = new MaterialService(materialRepository);
-        // Create instances of the management classes
+        projectService = new ProjectService(materialService,new LaborService(new LaborRepository()),projectRepository);
+
+
         ManageClient manageClient = new ManageClient(clientService);
         ManageMaterial manageMaterial = new ManageMaterial(materialService,projectService);
-        /*ManageComponents manageComponents = new ManageComponents();
-        ManageProject manageProject = new ManageProject();
-        ManageQuotes manageQuotes = new ManageQuotes();
+        ManageProject manageProject = new ManageProject(projectService);
 
-         */
 
-        // Create the main menu with the management class instances
-        MainMenu mainMenu = new MainMenu(manageClient ,manageMaterial/*,manageComponents, manageProject, manageQuotes*/);
+        MainMenu mainMenu = new MainMenu(manageClient ,manageMaterial,manageProject);
         mainMenu.displayMainMenu();
     }
 }
+
+
+
 
 

@@ -26,7 +26,17 @@ public class Project {
     public Project(Long projectId) {
     }
 
+    public Project(Long id, String name, double profitMargin, double totalCost, ProjectStatus projectStatus, Client client) {
+        this.id = id;
+        this.name = name;
+        this.profitMargin = profitMargin;
+        this.totalCost = totalCost;
+        this.projectStatus = projectStatus;
+        this.client = client;
+    }
+
     public Project(Long id, String name, double newTotalCost, ProjectStatus projectStatus, Client client) {
+
     }
 
     public Long getId() {
