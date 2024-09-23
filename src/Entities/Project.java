@@ -78,4 +78,18 @@ public class Project {
     public void setComponents(List<Component> components) {
         this.components = components;
     }
+
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", profitMargin=" + profitMargin +
+                ", totalCost=" + totalCost +
+                ", projectStatus=" + projectStatus +
+                ", client=" + client +
+                ", components=" + components +
+                '}';
+    }
 }

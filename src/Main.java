@@ -1,13 +1,26 @@
+import Entities.Project;
 import Menus.ClientMenu;
 import Menus.MaterialMenu;
 import Menus.ProjectMenu;
-import Menus.LaborMenu; // Import LaborMenu
+import Menus.LaborMenu;
 import Repositories.*;
 import Services.*;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    // ANSI escape codes for colors
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String YELLOW = "\u001B[33m";
+    public static final String BLUE = "\u001B[34m";
+    public static final String CYAN = "\u001B[36m";
+    public static final String WHITE = "\u001B[37m";
+    public static final String BOLD = "\033[1m";
+    public static final String UNDERLINE = "\033[4m";
+
     private static ClientService clientService;
     private static ClientRepository clientRepository;
     private static ClientMenu clientMenu;
@@ -38,44 +51,73 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
 
-        System.out.println("=== Bienvenue dans l'application de gestion des projets de rénovation de cuisines ===");
+        // Header
+        System.out.println(BOLD + BLUE + "=================================================" + RESET);
+        System.out.println(BOLD + YELLOW + "=== Bienvenue dans l'application de gestion ===" + RESET);
+        System.out.println(BOLD + YELLOW + "=== des projets de rénovation de cuisines ===" + RESET);
+        System.out.println(BOLD + BLUE + "=================================================\n" + RESET);
 
         while (isRunning) {
-            System.out.println("=== Menu Principal ===");
-            System.out.println("1. Créer un nouveau projet");
-            System.out.println("2. Afficher les projets existants");
-            System.out.println("3. Calculer le coût d'un projet");
-            System.out.println("4. Quitter");
-            System.out.print("Choisissez une option : ");
+            // Main Menu
+            System.out.println(GREEN + BOLD + "========== Menu Principal ==========" + RESET);
+            System.out.println(CYAN + "| 1. Créer un nouveau projet        |" + RESET);
+            System.out.println(CYAN + "| 2. Afficher les projets existants |" + RESET);
+            System.out.println(CYAN + "| 3. Calculer le coût d'un projet   |" + RESET);
+            System.out.println(CYAN + "| 4. Quitter                        |" + RESET);
+            System.out.println(GREEN + BOLD + "=====================================" + RESET);
+            System.out.print(YELLOW + BOLD + "Veuillez choisir une option : " + RESET);
 
             int mainChoice = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); 
 
             switch (mainChoice) {
                 case 1:
                     createProject(scanner);
                     break;
                 case 2:
-                    // displayExistingProjects();
+                    displayExistingProjects();
                     break;
                 case 3:
-                    // calculate();
+                    calculateExistingProjectCost(scanner);
                     break;
                 case 4:
                     isRunning = false;
-                    System.out.println("Au revoir !");
+                    System.out.println(RED + BOLD + "\nMerci d'avoir utilisé l'application. Au revoir !" + RESET);
                     break;
                 default:
-                    System.out.println("Option invalide. Veuillez réessayer.");
+                    System.out.println(RED + BOLD + "\nOption invalide. Veuillez réessayer." + RESET);
                     break;
             }
+
+            System.out.println();
         }
 
         scanner.close();
     }
 
+    private static void calculateExistingProjectCost(Scanner scanner) {
+        displayExistingProjects();
+        System.out.print(BOLD + "Entrez l'ID du projet pour calculer les coûts : " + RESET);
+        int projectId = scanner.nextInt();
+
+        System.out.println(BOLD + GREEN + "Le coût total estimé du projet avec ID " + projectId + " est de : 1000 €.\n" + RESET);
+    }
+
+    private static void displayExistingProjects() {
+        List<Project> projects = projectService.findAll();
+        System.out.println(BOLD + BLUE + "\n======= Liste des Projets =======" + RESET);
+        if (projects.isEmpty()) {
+            System.out.println(RED + "Aucun projet existant." + RESET);
+        } else {
+            for (Project project : projects) {
+                System.out.println(WHITE + project.toString() + RESET);
+            }
+        }
+        System.out.println(BOLD + BLUE + "=================================\n" + RESET);
+    }
+
     private static void createProject(Scanner scanner) {
-        ProjectMenu projectMenu = new ProjectMenu(projectService, clientMenu, materialMenu, laborMenu,materialService,laborService,quoteService);
+        ProjectMenu projectMenu = new ProjectMenu(projectService, clientMenu, materialMenu, laborMenu, materialService, laborService, quoteService);
         projectMenu.manageClient(scanner);
     }
 }

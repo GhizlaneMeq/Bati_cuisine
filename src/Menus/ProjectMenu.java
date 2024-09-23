@@ -104,11 +104,8 @@ public class ProjectMenu {
 
 package Menus;
 
-import Entities.Client;
+import Entities.*;
 import Entities.Enum.ProjectStatus;
-import Entities.Material;
-import Entities.Project;
-import Entities.Labor;
 import Services.*;
 
 import java.time.LocalDate;
@@ -252,9 +249,7 @@ public class ProjectMenu {
         System.out.print("Entrez la date de validité du devis (format : jj/mm/aaaa) : ");
         String validityDateInput = scanner.nextLine();
         LocalDate validityDate = LocalDate.parse(validityDateInput, formatter);
-
-        // Here you can create a Quote entity and save it using the QuoteService
-        // For now, we'll just print it out for demonstration
+        quoteService.save(new Quote(total,issueDate,validityDate,false,project));
         System.out.printf("Devis enregistré :\nMontant estimé : %.2f €\nDate d'émission : %s\nDate de validité : %s\n",
                 total, issueDate.format(formatter), validityDate.format(formatter));
 
