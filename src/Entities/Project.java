@@ -1,6 +1,8 @@
 package Entities;
 
 import Entities.Enum.ProjectStatus;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class Project {
@@ -12,13 +14,29 @@ public class Project {
     private Client client;
     private List<Component> components;
 
-    public Project(String name, double profitMargin, double totalCost, ProjectStatus projectStatus, Client client, List<Component> components) {
+    public Project(String name, double profitMargin, double totalCost, ProjectStatus projectStatus, Client client) {
         this.name = name;
         this.profitMargin = profitMargin;
         this.totalCost = totalCost;
         this.projectStatus = projectStatus;
         this.client = client;
-        this.components = components;
+        this.components = new ArrayList<>();
+    }
+
+    public Project(Long projectId) {
+    }
+
+    public Project(Long id, String name, double profitMargin, double totalCost, ProjectStatus projectStatus, Client client) {
+        this.id = id;
+        this.name = name;
+        this.profitMargin = profitMargin;
+        this.totalCost = totalCost;
+        this.projectStatus = projectStatus;
+        this.client = client;
+    }
+
+    public Project(Long id, String name, double newTotalCost, ProjectStatus projectStatus, Client client) {
+
     }
 
     public Long getId() {
@@ -75,5 +93,26 @@ public class Project {
 
     public void setComponents(List<Component> components) {
         this.components = components;
+    }
+
+    public void addComponent(Component component) {
+        components.add(component);
+    }
+
+    public void removeComponent(Component component) {
+        components.remove(component);
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", profitMargin=" + profitMargin +
+                ", totalCost=" + totalCost +
+                ", projectStatus=" + projectStatus +
+                ", client=" + client +
+                ", components=" + components +
+                '}';
     }
 }

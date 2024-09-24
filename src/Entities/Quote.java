@@ -18,6 +18,15 @@ public class Quote {
         this.project = project;
     }
 
+    public Quote(Long id, double estimatedAmount, LocalDate issueDate, LocalDate validityDate, boolean isAccepted, Project project) {
+        this.id = id;
+        this.estimatedAmount = estimatedAmount;
+        this.issueDate = issueDate;
+        this.validityDate = validityDate;
+        this.isAccepted = isAccepted;
+        this.project = project;
+    }
+
     public Long getId() {
         return id;
     }
@@ -64,5 +73,17 @@ public class Quote {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    @Override
+    public String toString() {
+        return "Quote{" +
+                "id=" + id +
+                ", estimatedAmount=" + estimatedAmount +
+                ", issueDate=" + issueDate +
+                ", validityDate=" + validityDate +
+                ", isAccepted=" + isAccepted +
+                ", project=" + project +
+                '}';
     }
 }

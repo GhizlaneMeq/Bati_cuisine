@@ -1,50 +1,76 @@
 package Menus;
 
-
 import Entities.Client;
-import Repositories.ClientRepository;
 import Services.ClientService;
 
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
 public class ClientMenu {
-    private ClientRepository clientRepository = new ClientRepository();
-   private ClientService clientService = new ClientService(clientRepository);
+    private ClientService clientService;
     Scanner scanner = new Scanner(System.in);
 
-    public void create() {
-        System.out.println("--- Ajout d'un nouveau client ---");
+    public ClientMenu(ClientService clientService) {
+        this.clientService = clientService;
+    }
+
+    public Client create() {
+        System.out.println("\n--- Ajouter un nouveau client ---");
         System.out.print("Entrez le nom du client : ");
         String name = scanner.nextLine();
         System.out.print("Entrez l'adresse du client : ");
         String address = scanner.nextLine();
         System.out.print("Entrez le numéro de téléphone du client : ");
-        String phone = scanner.nextLine();
-        System.out.println("Choisissez si le client est professionnel (oui/non) :");
-        String choice = scanner.nextLine();
-        boolean isProfessional;
+        String phoneNumber = scanner.nextLine();
+        System.out.print("Le client est-il professionnel (true pour oui, false pour non) : ");
+        boolean status = scanner.nextBoolean();
+        scanner.nextLine();
 
-        if (choice.equalsIgnoreCase("oui")) {
-            isProfessional = true;
-        } else if (choice.equalsIgnoreCase("non")) {
-            isProfessional = false;
-        } else {
-            System.out.println("Choix invalide. Le client sera enregistré comme non professionnel par défaut.");
-            isProfessional = false;
+        Client client = new Client(name, address, phoneNumber, status);
+
+        try {
+            Client savedClient = clientService.save(client);
+            if (savedClient == null) {
+                System.out.println("Un client avec le même nom existe déjà.");
+                return null;
+            } else {
+                System.out.println("Client ajouté avec succès.");
+                return savedClient;
+            }
+        } catch (Exception e) {
+            System.out.println("Une erreur s'est produite lors de l'ajout du client : " + e.getMessage());
+            return null;
         }
-
-        Client client = new Client(name, address, phone, isProfessional);
-        clientService.save(client);
-
-        System.out.println("Nouveau client ajouté !");
-        System.out.println("Nom : " + name);
-        System.out.println("Adresse : " + address);
-        System.out.println("Téléphone : " + phone);
-        System.out.println("Vous pouvez maintenant créer le projet pour " + name + ".");
     }
+
+    public Optional<Client> search() {
+        System.out.println("\n--- Recherche d'un client existant ---");
+        System.out.print("Entrez le nom du client : ");
+        String name = scanner.nextLine();
+
+        try {
+            Optional<Client> client = clientService.findByName(name);
+
+            if (client.isPresent()) {
+                Client foundClient = client.get();
+                System.out.println("\nClient trouvé :");
+                System.out.println("Nom : " + foundClient.getName());
+                System.out.println("Adresse : " + foundClient.getAddress());
+                System.out.println("Numéro de téléphone : " + foundClient.getPhone());
+                System.out.println("Statut professionnel : " + (foundClient.isProfessional() ? "Oui" : "Non"));
+                return client;
+            } else {
+                System.out.println("Aucun client trouvé avec le nom : " + name);
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            System.out.println("Une erreur s'est produite lors de la recherche du client : " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+}
+
+/*
 
     public void update(){
         System.out.println("--- Modifier un client ---");
@@ -119,3 +145,5 @@ public class ClientMenu {
         }
     }
 }
+
+ */

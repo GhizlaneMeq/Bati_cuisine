@@ -107,6 +107,36 @@ public class MaterialRepository implements GenericRepositoryInterface<Material> 
         }
     }
 
+    public List<Material> findByProjectId(Long projectId) {
+        String query = "SELECT * FROM materials WHERE project_id = ?";
+        List<Material> materials = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, projectId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                materials.add(mapResultSetToMaterial(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return materials;
+    }
+
+    public List<Material> findByName(String name) {
+        String query = "SELECT * FROM materials WHERE name LIKE ?";
+        List<Material> materials = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, "%" + name + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                materials.add(mapResultSetToMaterial(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return materials;
+    }
+
     private Material mapResultSetToMaterial(ResultSet rs) throws SQLException {
         Long id = rs.getLong("id");
         String name = rs.getString("name");
@@ -121,6 +151,7 @@ public class MaterialRepository implements GenericRepositoryInterface<Material> 
         ProjectRepository projectRepo = new ProjectRepository();
         Project project = projectRepo.findById(projectId).orElse(null);
 
-        return new Material(name, componentType, vatRate, project, unitCost, quantity, transportCost, qualityCoefficient);
+        return new Material(id, name, componentType, vatRate, project, unitCost, quantity, transportCost, qualityCoefficient);
+
     }
 }

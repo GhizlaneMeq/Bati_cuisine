@@ -20,7 +20,7 @@ public class ProjectRepository implements GenericRepositoryInterface<Project> {
 
     @Override
     public Project save(Project project) {
-        String query = "INSERT INTO projects (name, profitMargin, totalCost, projectStatus, client_id) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        String query = "INSERT INTO projects (name, profitMargin, totalCost, projectStatus, client_id) VALUES (?, ?, ?, ?::project_status, ?) RETURNING id";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, project.getName());
             stmt.setDouble(2, project.getProfitMargin());
@@ -73,7 +73,7 @@ public class ProjectRepository implements GenericRepositoryInterface<Project> {
 
     @Override
     public Project update(Project project) {
-        String query = "UPDATE projects SET name = ?, profitMargin = ?, totalCost = ?, projectStatus = ?, client_id = ? WHERE id = ?";
+        String query = "UPDATE projects SET name = ?, profitMargin = ?, totalCost = ?, projectStatus = ?::project_status, client_id = ? WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
             stmt.setString(1, project.getName());
             stmt.setDouble(2, project.getProfitMargin());
@@ -112,6 +112,23 @@ public class ProjectRepository implements GenericRepositoryInterface<Project> {
         ClientRepository clientRepo = new ClientRepository();
         Client client = clientRepo.findById(clientId).orElse(null);
 
-        return new Project(name, profitMargin, totalCost, status, client, null); // components will need separate handling
+        return new Project(id,name, profitMargin, totalCost, status, client);
     }
+
+    public List<Project> findProjectsByClient(Long clientId) {
+        String query = "SELECT * FROM projects WHERE client_id = ?";
+        List<Project> projects = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setLong(1, clientId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                // Assuming you have a Project constructor that takes ResultSet or a mapping method
+                projects.add(mapResultSetToProject(rs));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        return projects;
+    }
+
 }

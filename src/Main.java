@@ -1,116 +1,180 @@
+/*
+import Entities.Project;
+import Menus.ClientMenu;
+import Menus.MaterialMenu;
+import Menus.ProjectMenu;
+import Menus.LaborMenu;
+import Repositories.*;
+import Services.*;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    public static final String RESET = "\u001B[0m";
+    public static final String RED = "\u001B[31m";
+    public static final String GREEN = "\u001B[32m";
+    public static final String YELLOW = "\u001B[33m";
+    public static final String BLUE = "\u001B[34m";
+    public static final String CYAN = "\u001B[36m";
+    public static final String WHITE = "\u001B[37m";
+    public static final String BOLD = "\033[1m";
+    public static final String UNDERLINE = "\033[4m";
+
+    private static ClientService clientService;
+    private static ClientRepository clientRepository;
+    private static ClientMenu clientMenu;
+    private static MaterialService materialService;
+    private static MaterialRepository materialRepository;
+    private static MaterialMenu materialMenu;
+    private static ProjectService projectService;
+    private static ProjectRepository projectRepository;
+    private static LaborRepository laborRepository;
+    private static LaborService laborService;
+    private static LaborMenu laborMenu;
+    private static QuoteService quoteService;
+    private static QuoteRepository quoteRepository;
+
     public static void main(String[] args) {
+        clientRepository = new ClientRepository();
+        materialRepository = new MaterialRepository();
+        projectRepository = new ProjectRepository();
+        laborRepository = new LaborRepository();
+        quoteRepository = new QuoteRepository();
+
+        laborService = new LaborService(laborRepository);
+        materialService = new MaterialService(materialRepository);
+        projectService = new ProjectService(materialService, laborService, projectRepository);
+        clientService = new ClientService(clientRepository, projectService);
+        quoteService = new QuoteService(quoteRepository);
+
+        clientMenu = new ClientMenu(clientService);
+        materialMenu = new MaterialMenu(materialService);
+        laborMenu = new LaborMenu(laborService);
 
         Scanner scanner = new Scanner(System.in);
         boolean isRunning = true;
-        System.out.println("=== Bienvenue dans l'application de gestion des projets de rénovation de cuisines ===");
+
+        System.out.println(BOLD + BLUE + "=================================================" + RESET);
+        System.out.println(BOLD + YELLOW + "=== Bienvenue dans l'application de gestion ===" + RESET);
+        System.out.println(BOLD + YELLOW + "=== des projets de rénovation de cuisines ===" + RESET);
+        System.out.println(BOLD + BLUE + "=================================================\n" + RESET);
+
         while (isRunning) {
-            System.out.println("=== Menu Principal ===");
-            System.out.println("1. Créer un nouveau projet");
-            System.out.println("2. Afficher les projets existants");
-            System.out.println("3. Calculer le coût d'un projet");
-            System.out.println("4. Quitter");
-            System.out.print("Choisissez une option : ");
+            System.out.println(GREEN + BOLD + "========== Menu Principal ==========" + RESET);
+            System.out.println(CYAN + "| 1. Créer un nouveau projet        |" + RESET);
+            System.out.println(CYAN + "| 2. Afficher les projets existants |" + RESET);
+            System.out.println(CYAN + "| 3. Calculer le coût d'un projet   |" + RESET);
+            System.out.println(CYAN + "| 4. Quitter                        |" + RESET);
+            System.out.println(GREEN + BOLD + "=====================================" + RESET);
+            System.out.print(YELLOW + BOLD + "Veuillez choisir une option : " + RESET);
 
             int mainChoice = scanner.nextInt();
             scanner.nextLine();
 
             switch (mainChoice) {
                 case 1:
-                    creerNouveauProjet(scanner);
+                    createProject(scanner);
                     break;
                 case 2:
-                    afficherProjets();
+                    displayExistingProjects();
                     break;
                 case 3:
-                    calculerCoutProjet();
+                    calculateExistingProjectCost(scanner);
                     break;
                 case 4:
                     isRunning = false;
-                    System.out.println("Au revoir !");
+                    System.out.println(RED + BOLD + "\nMerci d'avoir utilisé l'application. Au revoir !" + RESET);
                     break;
                 default:
-                    System.out.println("Option invalide. Veuillez réessayer.");
+                    System.out.println(RED + BOLD + "\nOption invalide. Veuillez réessayer." + RESET);
                     break;
             }
+
+            System.out.println();
         }
 
         scanner.close();
     }
 
-    private static void creerNouveauProjet(Scanner scanner) {
-        System.out.println("--- Recherche de client ---");
-        System.out.println("Souhaitez-vous chercher un client existant ou en ajouter un nouveau ?");
-        System.out.println("1. Chercher un client existant");
-        System.out.println("2. Ajouter un nouveau client");
-        System.out.print("Choisissez une option : ");
+    private static void calculateExistingProjectCost(Scanner scanner) {
+        displayExistingProjects();
+        System.out.print(BOLD + "Entrez l'ID du projet pour calculer les coûts : " + RESET);
+        int projectId = scanner.nextInt();
 
-        int clientChoice = scanner.nextInt();
-        scanner.nextLine();
-
-        switch (clientChoice) {
-            case 1:
-                rechercherClient(scanner);
-                break;
-            case 2:
-                ajouterNouveauClient(scanner);
-                break;
-            default:
-                System.out.println("Option invalide.");
-                break;
-        }
+        System.out.println(BOLD + GREEN + "Le coût total estimé du projet avec ID " + projectId + " est de : 1000 €.\n" + RESET);
     }
 
-    private static void rechercherClient(Scanner scanner) {
-        System.out.println("--- Recherche de client existant ---");
-        System.out.print("Entrez le nom du client : ");
-        String nomClient = scanner.nextLine();
-
-        // Simulation de recherche du client dans la base de données
-        if ("Mme Dupont".equalsIgnoreCase(nomClient)) {
-            System.out.println("Client trouvé !");
-            System.out.println("Nom : Mme Dupont");
-            System.out.println("Adresse : 12 Rue des Fleurs, Paris");
-            System.out.println("Numéro de téléphone : 06 12345678");
-
-            System.out.print("Souhaitez-vous continuer avec ce client ? (y/n) : ");
-            String choix = scanner.nextLine();
-            if ("y".equalsIgnoreCase(choix)) {
-                System.out.println("Vous pouvez maintenant créer le projet pour Mme Dupont.");
-                // Logique pour continuer à créer le projet...
-            } else {
-                System.out.println("Retour au menu principal.");
-            }
+    private static void displayExistingProjects() {
+        List<Project> projects = projectService.findAll();
+        System.out.println(BOLD + BLUE + "\n======= Liste des Projets =======" + RESET);
+        if (projects.isEmpty()) {
+            System.out.println(RED + "Aucun projet existant." + RESET);
         } else {
-            System.out.println("Client non trouvé.");
+            for (Project project : projects) {
+                System.out.println(WHITE + project.toString() + RESET);
+            }
         }
+        System.out.println(BOLD + BLUE + "=================================\n" + RESET);
     }
 
-    private static void ajouterNouveauClient(Scanner scanner) {
-        System.out.println("--- Ajout d'un nouveau client ---");
-        System.out.print("Entrez le nom du client : ");
-        String nom = scanner.nextLine();
-        System.out.print("Entrez l'adresse du client : ");
-        String adresse = scanner.nextLine();
-        System.out.print("Entrez le numéro de téléphone du client : ");
-        String telephone = scanner.nextLine();
-        System.out.println("Nouveau client ajouté !");
-        System.out.println("Nom : " + nom);
-        System.out.println("Adresse : " + adresse);
-        System.out.println("Téléphone : " + telephone);
-
-        System.out.println("Vous pouvez maintenant créer le projet pour " + nom + ".");
-    }
-
-    private static void afficherProjets() {
-        System.out.println("--- Affichage des projets existants ---");
-        System.out.println("Aucun projet disponible pour le moment.");
-    }
-
-    private static void calculerCoutProjet() {
-        System.out.println("--- Calcul du coût du projet ---");
-        System.out.println("Fonctionnalité à implémenter.");
+    private static void createProject(Scanner scanner) {
+        ProjectMenu projectMenu = new ProjectMenu(projectService, clientMenu, materialMenu, laborMenu, quoteService);
+        projectMenu.manageClient(scanner);
     }
 }
+
+
+
+
+ */
+
+
+
+
+import Menus.*;
+import Repositories.*;
+import Services.*;
+
+
+public class Main {
+    private static ClientService clientService;
+    private static ProjectService projectService;
+    private static ClientRepository clientRepository;
+    private static ProjectRepository projectRepository;
+    private static MaterialService materialService;
+    private static MaterialRepository materialRepository;
+    private static LaborRepository laborRepository;
+    private static LaborService laborService;
+    private static QuoteRepository quoteRepository;
+    private static QuoteService quoteService;
+    public static void main(String[] args) {
+        clientRepository = new ClientRepository();
+        projectRepository = new ProjectRepository();
+        materialRepository = new MaterialRepository();
+        laborRepository = new LaborRepository();
+        quoteRepository = new QuoteRepository();
+
+        materialService = new MaterialService(materialRepository);
+        projectService = new ProjectService(materialService,new LaborService(new LaborRepository()),projectRepository);
+        clientService = new ClientService(clientRepository,projectService);
+        laborService = new LaborService(laborRepository);
+        quoteService = new QuoteService(quoteRepository);
+
+
+        ManageClient manageClient = new ManageClient(clientService);
+        ManageMaterial manageMaterial = new ManageMaterial(materialService,projectService);
+        ManageLabor manageLabor = new ManageLabor(laborService);
+        ManageQuote manageQuote = new ManageQuote(quoteService,projectService);
+        ManageProject manageProject = new ManageProject(projectService,manageClient,manageMaterial,manageLabor,manageQuote);
+
+
+        MainMenu mainMenu = new MainMenu(manageClient ,manageMaterial,manageLabor,manageProject,manageQuote);
+        mainMenu.displayMainMenu();
+    }
+}
+
+
+
+
+

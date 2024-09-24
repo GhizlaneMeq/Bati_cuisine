@@ -117,11 +117,12 @@ public class ClientRepository implements ClientrepositoryInterface {
     }
 
     private Client mapResultSetToClient(ResultSet rs) throws SQLException {
+        long id = rs.getLong("id");
         String name = rs.getString("name");
         String address = rs.getString("address");
         String phone = rs.getString("phone");
         boolean isProfessional = rs.getBoolean("isProfessional");
-        return new Client(name, address, phone, isProfessional);
+        return new Client(id,name, address, phone, isProfessional);
     }
 
 

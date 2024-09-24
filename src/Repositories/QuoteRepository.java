@@ -113,6 +113,6 @@ public class QuoteRepository implements GenericRepositoryInterface<Quote> {
         ProjectRepository projectRepo = new ProjectRepository();
         Project project = projectRepo.findById(projectId).orElse(null);
 
-        return new Quote(estimatedAmount, issueDate, validityDate, isAccepted, project);
+        return new Quote(id,estimatedAmount, issueDate, validityDate, isAccepted, project);
     }
 }
