@@ -92,7 +92,6 @@ public class ManageProject {
         addMaterialsToProject(project);
         addLaborToProject(project);
 
-        // Ask about profit margin after adding labor
         System.out.print("Souhaitez-vous appliquer une marge bénéficiaire au projet ? (y/n) : ");
         String applyMargin = scanner.nextLine().trim().toLowerCase();
         if (applyMargin.equals("y")) {
@@ -102,7 +101,7 @@ public class ManageProject {
             project.setProfitMargin(profitMargin);
             projectService.update(project);
             double[] totalCostDetails = projectService.calculateTotalCost(project, profitMargin / 100);
-            project.setTotalCost(totalCostDetails[3]);
+            project.setTotalCost(totalCostDetails[1]);
             projectService.update(project);
             displayCalculationResults(project, totalCostDetails, profitMargin);
         } else {

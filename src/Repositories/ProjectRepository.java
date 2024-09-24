@@ -122,7 +122,6 @@ public class ProjectRepository implements GenericRepositoryInterface<Project> {
             stmt.setLong(1, clientId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                // Assuming you have a Project constructor that takes ResultSet or a mapping method
                 projects.add(mapResultSetToProject(rs));
             }
         } catch (SQLException e) {

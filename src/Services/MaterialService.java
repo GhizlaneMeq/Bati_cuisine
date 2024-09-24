@@ -35,20 +35,37 @@ public class MaterialService {
     public List<Material> findAll() {
         return materialRepository.findAll();
     }
+    public List<Material> findByName(String name) {
+        return materialRepository.findByName(name);
+    }
 
     public Optional<Material> update(Material material) {
+
         try {
             Optional<Material> existingMaterialOptional = materialRepository.findById(material.getId());
+
             if (existingMaterialOptional.isPresent()) {
-                Material updatedMaterial = materialRepository.update(material);
-                return Optional.ofNullable(updatedMaterial);
+                Material existingMaterial = existingMaterialOptional.get();
+
+                if (!material.equals(existingMaterial)) {
+                    Material updatedMaterial = materialRepository.update(material);
+                    System.out.println("Material updated successfully: " + updatedMaterial);
+                    return Optional.ofNullable(updatedMaterial);
+                } else {
+                    System.out.println("No changes detected. Material was not updated.");
+                    return Optional.of(existingMaterial);
+                }
+            } else {
+                System.out.println("No material found with ID: " + material.getId());
+                return Optional.empty();
             }
         } catch (Exception e) {
-            System.out.println("Une erreur s'est produite lors de la mise à jour du matériau : " + e.getMessage());
+            System.out.println("An error occurred while updating the material: " + e.getMessage());
+            e.printStackTrace();
             return Optional.empty();
         }
-        return Optional.empty();
     }
+
 
     public boolean delete(Long id) {
         return materialRepository.delete(id);
