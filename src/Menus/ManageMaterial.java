@@ -72,7 +72,7 @@ public class ManageMaterial {
 
         System.out.print("👉 Choisissez une option : ");
         int choice = scanner.nextInt();
-        scanner.nextLine(); 
+        scanner.nextLine();
 
         switch (choice) {
             case 1:

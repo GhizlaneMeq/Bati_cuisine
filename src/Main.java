@@ -30,7 +30,7 @@ public class Main {
 
         ManageClient manageClient = new ManageClient(clientService);
         ManageMaterial manageMaterial = new ManageMaterial(materialService,projectService);
-        ManageLabor manageLabor = new ManageLabor(laborService);
+        ManageLabor manageLabor = new ManageLabor(laborService,projectService);
         ManageQuote manageQuote = new ManageQuote(quoteService,projectService);
         ManageProject manageProject = new ManageProject(projectService,manageClient,manageMaterial,manageLabor,manageQuote);
 

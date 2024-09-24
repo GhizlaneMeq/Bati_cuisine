@@ -119,7 +119,6 @@ public class ManageProject {
         System.out.printf("Client : %s\n", project.getClient().getName());  // Assuming Client has a getName() method
         System.out.printf("Adresse du chantier : %s\n", project.getClient().getAddress());  // Assuming Client has a getAddress() method
 
-        // Materials
         System.out.println("--- Détail des Coûts ---");
         System.out.println("1. Matériaux :");
         double totalMaterialsBeforeVAT = 0;
@@ -141,7 +140,7 @@ public class ManageProject {
             totalMaterialsWithVAT += totalCostWithVAT;
         }
         System.out.printf("**Coût total des matériaux avant TVA : %.2f €**\n", totalMaterialsBeforeVAT);
-    //    System.out.printf("**Coût total des matériaux avec TVA (%.0f%%) : %.2f €**\n", materials.get(0).getVatRate() * 100, totalMaterialsWithVAT); // Assuming VAT rate is the same for all materials
+        //    System.out.printf("**Coût total des matériaux avec TVA (%.0f%%) : %.2f €**\n", materials.get(0).getVatRate() * 100, totalMaterialsWithVAT); // Assuming VAT rate is the same for all materials
 
         // Labor
         System.out.println("2. Main-d'œuvre :");

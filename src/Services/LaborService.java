@@ -60,4 +60,10 @@ public class LaborService {
 
         return new double[]{totalWithoutVAT, totalWithVAT};
     }
+
+    public List<Labor> findByName(String laborName) {
+        return laborRepository.findByName(laborName);
+    }
+
+
 }

@@ -13,6 +13,14 @@ public class Labor extends Component {
         this.workerProductivity = workerProductivity;
     }
 
+    public Labor(Long id, String name, String componentType, double vatRate, Project project, double hourlyRate, double hoursWorked, double workerProductivity) {
+        super(id, name, componentType, vatRate, project);
+        this.id = id;
+        this.hourlyRate = hourlyRate;
+        this.hoursWorked = hoursWorked;
+        this.workerProductivity = workerProductivity;
+    }
+
     @Override
     public Long getId() {
         return id;

@@ -132,6 +132,21 @@ public class LaborRepository implements GenericRepositoryInterface<Labor> {
         ProjectRepository projectRepo = new ProjectRepository();
         Project project = projectRepo.findById(projectId).orElse(null);
 
-        return new Labor(name, componentType, vatRate, project, hourlyRate, hoursWorked, workerProductivity);
+        return new Labor(id,name, componentType, vatRate, project, hourlyRate, hoursWorked, workerProductivity);
+    }
+
+    public List<Labor> findByName(String laborName) {
+        String query = "SELECT * FROM labor WHERE name ILIKE ?";
+        List<Labor> labors = new ArrayList<>();
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setString(1, "%" + laborName + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                labors.add(mapResultSetToLabor(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return labors;
     }
 }
