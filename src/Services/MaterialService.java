@@ -76,18 +76,31 @@ public class MaterialService {
         double totalWithoutVAT = 0;
         double totalWithVAT = 0;
 
+        System.out.println("1. Matériaux :");
+
         for (Material material : materials) {
             double baseCost = material.getQuantity() * material.getUnitCost();
             double transportCost = material.getTransportCost();
             double qualityCoefficient = material.getQualityCoefficient();
 
             double totalCostBeforeVAT = (baseCost * qualityCoefficient) + transportCost;
-            double totalCostWithVAT = totalCostBeforeVAT * (1 + material.getVatRate()/100);
+            double totalCostWithVAT = totalCostBeforeVAT * (1 + material.getVatRate() / 100);
 
             totalWithoutVAT += totalCostBeforeVAT;
             totalWithVAT += totalCostWithVAT;
+
+            System.out.printf("- %s : %.2f € (quantité : %.2f, coût unitaire : %.2f €/m², qualité : %.2f, transport : %.2f €)%n",
+                    material.getName(), totalCostBeforeVAT, material.getQuantity(),
+                    material.getUnitCost(), material.getQualityCoefficient(), transportCost);
         }
+
+        System.out.printf("**Coût total des matériaux avant TVA : %.2f €**%n", totalWithoutVAT);
+        System.out.printf("**Coût total des matériaux avec TVA (%.0f%%) : %.2f €**%n",
+                materials.size() > 0 ? materials.get(0).getVatRate() : 0, totalWithVAT);
 
         return new double[]{totalWithoutVAT, totalWithVAT};
     }
+
+
+
 }

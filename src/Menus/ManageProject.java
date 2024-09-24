@@ -87,8 +87,6 @@ public class ManageProject {
 
         Project project = new Project(projectName, 0, 0, ProjectStatus.InProgress, clientOptional.get());
         projectService.save(project);
-        System.out.println("Projet créé avec succès : " + project);
-
         addMaterialsToProject(project);
         addLaborToProject(project);
 
@@ -103,76 +101,11 @@ public class ManageProject {
             double[] totalCostDetails = projectService.calculateTotalCost(project, profitMargin / 100);
             project.setTotalCost(totalCostDetails[1]);
             projectService.update(project);
-            displayCalculationResults(project, totalCostDetails, profitMargin);
         } else {
             System.out.println("Aucune marge bénéficiaire appliquée.");
         }
         manageQuote.createQuote(project);
     }
-
-    private void displayCalculationResults(Project project, double[] totalCostDetails, double profitMargin) {
-        Optional<List<Material>> materials =manageMaterial.displayMaterialsByProject(project);
-        Optional<List<Labor>> labors = manageLabor.displayLaborByProject(project);
-
-        System.out.println("--- Résultat du Calcul ---");
-        System.out.printf("Nom du projet : %s\n", project.getName());
-        System.out.printf("Client : %s\n", project.getClient().getName());  // Assuming Client has a getName() method
-        System.out.printf("Adresse du chantier : %s\n", project.getClient().getAddress());  // Assuming Client has a getAddress() method
-
-        System.out.println("--- Détail des Coûts ---");
-        System.out.println("1. Matériaux :");
-        double totalMaterialsBeforeVAT = 0;
-        double totalMaterialsWithVAT = 0;
-
-        for (Material material : materials.get()) {
-            double baseCost = material.getQuantity() * material.getUnitCost();
-            double transportCost = material.getTransportCost();
-            double qualityCoefficient = material.getQualityCoefficient();
-
-            double totalCostBeforeVAT = (baseCost * qualityCoefficient) + transportCost;
-            double totalCostWithVAT = totalCostBeforeVAT * (1 + material.getVatRate());
-
-            System.out.printf("- %s : %.2f € (quantité : %.2f, coût unitaire : %.2f €/m², qualité : %.2f, transport : %.2f €)\n",
-                    material.getName(), totalCostWithVAT, material.getQuantity(), material.getUnitCost(),
-                    material.getQualityCoefficient(), transportCost);
-
-            totalMaterialsBeforeVAT += totalCostBeforeVAT;
-            totalMaterialsWithVAT += totalCostWithVAT;
-        }
-        System.out.printf("**Coût total des matériaux avant TVA : %.2f €**\n", totalMaterialsBeforeVAT);
-        //    System.out.printf("**Coût total des matériaux avec TVA (%.0f%%) : %.2f €**\n", materials.get(0).getVatRate() * 100, totalMaterialsWithVAT); // Assuming VAT rate is the same for all materials
-
-        // Labor
-        System.out.println("2. Main-d'œuvre :");
-        double totalLaborBeforeVAT = 0;
-        double totalLaborWithVAT = 0;
-
-        for (Labor labor : labors.get()) {
-            double baseCost = labor.getHourlyRate() * labor.getHoursWorked();
-            double adjustedCost = baseCost * labor.getWorkerProductivity();
-            double totalCostBeforeVAT = adjustedCost;
-            double totalCostWithVAT = totalCostBeforeVAT * (1 + labor.getVatRate());
-
-            System.out.printf("- %s : %.2f € (taux horaire : %.2f €/h, heures travaillées : %.2f h, productivité : %.2f)\n",
-                    labor.getName(), totalCostWithVAT, labor.getHourlyRate(), labor.getHoursWorked(),
-                    labor.getWorkerProductivity());
-
-            totalLaborBeforeVAT += totalCostBeforeVAT;
-            totalLaborWithVAT += totalCostWithVAT;
-        }
-        System.out.printf("**Coût total de la main-d'œuvre avant TVA : %.2f €**\n", totalLaborBeforeVAT);
-        //System.out.printf("**Coût total de la main-d'œuvre avec TVA (%.0f%%) : %.2f €**\n", labors.get(0).getVatRate() * 100, totalLaborWithVAT);
-
-        // Final totals
-        double totalCostBeforeMargin = totalCostDetails[0]; // Cost before margin
-        double totalCostWithMargin = totalCostDetails[3];   // Final cost
-        double totalMargin = totalCostDetails[2];
-
-        System.out.printf("3. Coût total avant marge : %.2f €\n", totalCostBeforeMargin);
-        System.out.printf("4. Marge bénéficiaire (%.0f%%) : %.2f €\n", profitMargin, totalMargin);
-        System.out.printf("**Coût total final du projet : %.2f €**\n", totalCostWithMargin);
-    }
-
 
 
     private void addMaterialsToProject(Project project) {
@@ -266,18 +199,10 @@ public class ManageProject {
         if (projectOptional.isPresent()) {
             Project project = projectOptional.get();
             System.out.println("Projet trouvé : " + project);
-
             System.out.print("Nouveau nom du projet (laisser vide pour ne pas modifier) : ");
             String newName = scanner.nextLine();
             if (!newName.isEmpty()) {
                 project.setName(newName);
-            }
-
-            System.out.print("Nouveau coût total (laisser vide pour ne pas modifier) : ");
-            String newCostInput = scanner.nextLine();
-            if (!newCostInput.isEmpty()) {
-                double newCost = Double.parseDouble(newCostInput);
-                project.setTotalCost(newCost);
             }
 
             System.out.print("Nouvelle marge bénéficiaire (%) (laisser vide pour ne pas modifier) : ");
@@ -285,6 +210,9 @@ public class ManageProject {
             if (!newProfitMarginInput.isEmpty()) {
                 double newProfitMargin = Double.parseDouble(newProfitMarginInput);
                 project.setProfitMargin(newProfitMargin);
+
+                double[] totalCostDetails = projectService.calculateTotalCost(project, newProfitMargin / 100);
+                project.setTotalCost(totalCostDetails[1]);
             }
 
             projectService.update(project);
@@ -293,6 +221,7 @@ public class ManageProject {
             System.out.println("Aucun projet trouvé avec l'ID : " + projectId);
         }
     }
+
 
     private void deleteProject() {
         System.out.print("Entrez l'ID du projet à supprimer : ");
