@@ -63,7 +63,7 @@ public class ManageClient {
         }
     }
 
-    private void addNewClient() {
+    public Optional<Client> addNewClient() {
         System.out.println("--- Ajouter un nouveau client ---");
         System.out.print("Entrez le nom du client : ");
         String name = scanner.nextLine();
@@ -93,33 +93,41 @@ public class ManageClient {
         Client client = new Client(name, address, phoneNumber, status);
 
         try {
-            Client savedClient = clientService.save(client);
-            if (savedClient == null) {
+            Optional<Client> existingClient = clientService.findByName(name);
+            if (existingClient.isPresent()) {
                 System.out.println("Un client avec le même nom existe déjà.");
+                return Optional.empty();
             } else {
+                Client savedClient = clientService.save(client);
                 System.out.println("Client ajouté avec succès.");
+                return Optional.of(savedClient);
             }
         } catch (Exception e) {
             System.out.println("Une erreur s'est produite lors de l'ajout du client : " + e.getMessage());
+            return Optional.empty();
         }
     }
 
-    private void searchClient() {
+
+    public Optional<Client> searchClient() {
         System.out.print("Entrez le nom du client à rechercher : ");
         String name = scanner.nextLine();
 
         try {
             Optional<Client> client = clientService.findByName(name);
             if (client.isPresent()) {
-                Client foundClient = client.get();
-                System.out.println("Client trouvé : " + foundClient);
+                System.out.println("Client trouvé : " + client.get());
+                return client;
             } else {
                 System.out.println("Aucun client trouvé avec le nom : " + name);
+                return Optional.empty();
             }
         } catch (Exception e) {
             System.out.println("Une erreur s'est produite lors de la recherche du client : " + e.getMessage());
+            return Optional.empty();
         }
     }
+
 
     private void modifyClient() {
         System.out.print("Entrez le nom du client à modifier : ");

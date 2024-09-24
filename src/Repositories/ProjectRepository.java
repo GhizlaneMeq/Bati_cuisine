@@ -112,7 +112,7 @@ public class ProjectRepository implements GenericRepositoryInterface<Project> {
         ClientRepository clientRepo = new ClientRepository();
         Client client = clientRepo.findById(clientId).orElse(null);
 
-        return new Project(name, profitMargin, totalCost, status, client);
+        return new Project(id,name, profitMargin, totalCost, status, client);
     }
 
     public List<Project> findProjectsByClient(Long clientId) {

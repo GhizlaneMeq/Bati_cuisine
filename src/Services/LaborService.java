@@ -42,7 +42,6 @@ public class LaborService {
         return laborRepository.findByProjectId(project.getId());
     }
 
-    // New method to calculate total cost of labor
     public double[] calculateTotalCost(Project project) {
         List<Labor> laborEntries = findByProject(project);
         double totalWithoutVAT = 0;
@@ -53,7 +52,7 @@ public class LaborService {
             double adjustedCost = baseCost * labor.getWorkerProductivity();
             double totalCostBeforeVAT = adjustedCost;
 
-            double totalCostWithVAT = totalCostBeforeVAT * (1 + labor.getVatRate());
+            double totalCostWithVAT = totalCostBeforeVAT * (1 + labor.getVatRate()/100);
 
             totalWithoutVAT += totalCostBeforeVAT;
             totalWithVAT += totalCostWithVAT;

@@ -65,7 +65,7 @@ public class MaterialService {
             double qualityCoefficient = material.getQualityCoefficient();
 
             double totalCostBeforeVAT = (baseCost * qualityCoefficient) + transportCost;
-            double totalCostWithVAT = totalCostBeforeVAT * (1 + material.getVatRate());
+            double totalCostWithVAT = totalCostBeforeVAT * (1 + material.getVatRate()/100);
 
             totalWithoutVAT += totalCostBeforeVAT;
             totalWithVAT += totalCostWithVAT;

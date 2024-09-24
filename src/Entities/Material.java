@@ -15,6 +15,15 @@ public class Material extends Component {
         this.qualityCoefficient = qualityCoefficient;
     }
 
+
+    public Material(Long id, String name, String componentType, double vatRate, Project project, double unitCost, double quantity, double transportCost, double qualityCoefficient) {
+        super(id, name, componentType, vatRate, project);
+        this.unitCost = unitCost;
+        this.quantity = quantity;
+        this.transportCost = transportCost;
+        this.qualityCoefficient = qualityCoefficient;
+    }
+
     @Override
     public Long getId() {
         return id;

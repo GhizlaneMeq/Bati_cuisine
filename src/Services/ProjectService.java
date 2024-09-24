@@ -56,27 +56,27 @@ public class ProjectService {
     }
 
     public double[] calculateTotalCost(Project project, double marginRate) {
-        // Calculate material costs
+
         double[] materialTotals = materialService.calculateTotalCost(project);
         double totalMaterialsWithoutVAT = materialTotals[0];
         double totalMaterialsWithVAT = materialTotals[1];
 
-        // Calculate labor costs
         double[] laborTotals = laborService.calculateTotalCost(project);
         double totalLaborWithoutVAT = laborTotals[0];
         double totalLaborWithVAT = laborTotals[1];
 
-        // Total costs before VAT
+
         double totalCostBeforeVAT = totalMaterialsWithoutVAT + totalLaborWithoutVAT;
 
-        // Total costs after applying VAT
         double totalCostWithVAT = totalMaterialsWithVAT + totalLaborWithVAT;
 
-        // Calculate the total margin
-        double totalMargin = totalCostWithVAT * marginRate;
-        // Final project cost
-        double finalTotalCost = totalCostWithVAT + totalMargin;
 
+        double totalMargin = totalCostWithVAT * marginRate;
+
+        double finalTotalCost = totalCostWithVAT + totalMargin;
+        System.out.println("withTva"+totalCostWithVAT);
+        System.out.println("withmargin"+totalMargin);
+        System.out.println("cout total"+finalTotalCost);
         return new double[]{totalCostBeforeVAT, totalCostWithVAT, totalMargin, finalTotalCost};
     }
 

@@ -1,5 +1,6 @@
 package Menus;
 
+import Entities.Labor;
 import Entities.Material;
 import Entities.Project;
 import Services.MaterialService;
@@ -27,12 +28,11 @@ public class ManageMaterial {
             System.out.println("\n*******************************************");
             System.out.println("           🏗️ Gestion des Matériaux 🏗️");
             System.out.println("*******************************************");
-            System.out.println("1️⃣  Ajouter un nouveau matériau");
-            System.out.println("2️⃣  Chercher un matériau existant");
-            System.out.println("3️⃣  Modifier un matériau");
-            System.out.println("4️⃣  Supprimer un matériau");
-            System.out.println("5️⃣  Afficher tous les matériaux");
-            System.out.println("6️⃣  Retourner au menu principal");
+            System.out.println("1️⃣  Chercher un matériau existant");
+            System.out.println("2️⃣  Modifier un matériau");
+            System.out.println("3️⃣  Supprimer un matériau");
+            System.out.println("4️⃣  Afficher tous les matériaux");
+            System.out.println("5️⃣  Retourner au menu principal");
             System.out.println("*******************************************");
             System.out.print("👉 Choisissez une option : ");
 
@@ -41,21 +41,18 @@ public class ManageMaterial {
 
             switch (choice) {
                 case 1:
-                    addNewMaterial();
-                    break;
-                case 2:
                     searchMaterial();
                     break;
-                case 3:
+                case 2:
                     modifyMaterial();
                     break;
-                case 4:
+                case 3:
                     deleteMaterial();
                     break;
-                case 5:
+                case 4:
                     displayMaterials();
                     break;
-                case 6:
+                case 5:
                     running = false;
                     System.out.println("🔙 Retour au menu principal...");
                     break;
@@ -69,58 +66,52 @@ public class ManageMaterial {
     private void searchMaterial() {
     }
 
-    private void addNewMaterial() {
+
+
+    public Optional<List<Material>> displayMaterialsByProject(Project project) {
+        List<Material> materials = materialService.findByProject(project);
+        if (materials.isEmpty()) {
+            System.out.println("Aucune main-d'œuvre trouvée pour le projet : " + project.getName());
+            return Optional.empty();
+        } else {
+            System.out.println("\n--- Main-d'œuvre pour le projet : " + project.getName() + " ---");
+            for (Material material : materials) {
+                System.out.println(material);
+            }
+            return Optional.of(materials);
+        }
+    }
+
+    public Optional<Material> addNewMaterial(Project project) {
         System.out.println("--- Ajouter un nouveau matériau ---");
         System.out.print("Entrez le nom du matériau : ");
         String name = scanner.nextLine();
+        System.out.print("Entrez la quantité de ce matériau (en m²) : ");
+        double quantity = scanner.nextDouble();
+        System.out.print("Entrez le coût unitaire de ce matériau (€/m²) : ");
+        double unitCost = scanner.nextDouble();
+        System.out.print("Entrez le coût de transport de ce matériau (€) : ");
+        double transportCost = scanner.nextDouble();
         System.out.print("Entrez le taux de TVA : ");
         double vatRate = scanner.nextDouble();
         scanner.nextLine();
-
-        System.out.print("Entrez l'ID du projet (ou laissez vide pour en créer un nouveau) : ");
-        String projectIdInput = scanner.nextLine();
-
-        Project project = null;
-
-        if (projectIdInput.isEmpty()) {
-            System.out.println("Vous pouvez créer un nouveau projet avec ces matériaux.");
-            // Call project management logic here to create a new project.
-            // projectManagementMenu();
-            return; // Exiting for now, implement project creation logic
-        } else {
-            Long projectId = Long.parseLong(projectIdInput);
-            Optional<Project> projectOptional = projectService.findById(projectId);
-            if (!projectOptional.isPresent()) {
-                System.out.println("Aucun projet trouvé avec l'ID : " + projectId);
-                return;
-            }
-            project = projectOptional.get();
-        }
-
-        System.out.print("Entrez le coût unitaire : ");
-        double unitCost = scanner.nextDouble();
-        System.out.print("Entrez la quantité : ");
-        double quantity = scanner.nextDouble();
-        System.out.print("Entrez le coût de transport : ");
-        double transportCost = scanner.nextDouble();
-        System.out.print("Entrez le coefficient de qualité : ");
-        double qualityCoefficient = scanner.nextDouble();
+        System.out.print("Entrez le coefficient de qualité du matériau (1.0 = standard, > 1.0 = haute qualité) : 1.1\n : ");
+        double qualityCoefficient = getValidDoubleInput();
         scanner.nextLine();
 
         Material material = new Material(name, "material", vatRate, project, unitCost, quantity, transportCost, qualityCoefficient);
 
         Optional<Material> savedMaterial = materialService.save(material);
+
         if (savedMaterial.isPresent()) {
             System.out.println("Matériau ajouté avec succès : " + savedMaterial.get());
-            if (project != null) {
-                updateProjectCosts(project);
-            } else {
-                System.out.println("Aucun projet associé pour mettre à jour les coûts.");
-            }
         } else {
             System.out.println("Erreur lors de l'ajout du matériau.");
         }
+
+        return savedMaterial;
     }
+
 
 
     private void modifyMaterial() {
@@ -140,9 +131,6 @@ public class ManageMaterial {
                 return;
             }
 
-            // Update material details here...
-            // Similar to how you would do in the previous example
-            // Then save the material
             materialService.update(material);
             System.out.println("Matériau mis à jour avec succès !");
             updateProjectCosts(material.getProject());
@@ -185,15 +173,25 @@ public class ManageMaterial {
     }
 
     private void updateProjectCosts(Project project) {
-        // Logic to calculate and update project costs
-        double[] totals = materialService.calculateTotalCost(project);
-        double totalMaterials = totals[0];
-        double totalMaterialsWithVAT = totals[1];
+        double[] newTotalCost = projectService.calculateTotalCost(project,project.getProfitMargin());
+        System.out.println("jhgfdsdfghjk"+project);
+        projectService.update(new Project(project.getId(), project.getName(), newTotalCost[3], project.getProjectStatus(), project.getClient()));
 
-        // Assuming the Project class has methods to update costs
-        double newTotalCost = project.getTotalCost() + totalMaterialsWithVAT; // Add your logic here
-        projectService.update(new Project(project.getId(), project.getName(), newTotalCost, project.getProjectStatus(), project.getClient()));
-
-        System.out.printf("Coût total du projet mis à jour : %.2f €\n", newTotalCost);
+        System.out.printf("Coût total du projet mis à jour : %.2f €\n", newTotalCost[3]);
     }
+
+
+
+
+    private double getValidDoubleInput() {
+        while (true) {
+            try {
+                return Double.parseDouble(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Entrée invalide. Veuillez entrer un nombre valide: ");
+            }
+        }
+    }
+
+
 }

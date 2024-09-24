@@ -14,6 +14,16 @@ public abstract class Component {
         this.project = project;
     }
 
+    public Component(Long id, String name, String componentType, double vatRate, Project project) {
+        this.id = id;
+        this.name = name;
+        this.componentType = componentType;
+        this.vatRate = vatRate;
+        this.project = project;
+    }
+
+
+
     public Long getId() {
         return id;
     }

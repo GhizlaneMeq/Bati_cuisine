@@ -19,6 +19,7 @@ public class Client {
         this.projects = new ArrayList<>();
     }
 
+
     public Client(Long id, String name, String address, String phone, boolean isProfessional) {
         this.id = id;
         this.name = name;

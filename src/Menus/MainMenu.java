@@ -6,16 +6,18 @@ public class MainMenu {
     private ManageClient manageClient;
     private ManageMaterial manageMaterial;
    private ManageProject manageProject;
-    //private ManageQuotes manageQuotes;
+   private ManageQuote manageQuote;
+   private  ManageLabor manageLabor;
 
-    public MainMenu(ManageClient manageClient, ManageMaterial manageMaterial,
-            ManageProject manageProject/*, ManageQuotes manageQuotes*/) {
+    public MainMenu(ManageClient manageClient, ManageMaterial manageMaterial, ManageLabor manageLabor,
+            ManageProject manageProject, ManageQuote manageQuote) {
         this.manageClient = manageClient;
         this.manageMaterial = manageMaterial;
+        this.manageLabor = manageLabor;
         this.manageProject = manageProject;
-       /* this.manageQuotes = manageQuotes;
+        this.manageQuote = manageQuote;
 
-         */
+
     }
 
     public void displayMainMenu() {
@@ -61,7 +63,7 @@ public class MainMenu {
     }
 
     private void manageQuotes() {
-        //manageQuotes.manageQuotes();
+        manageQuote.manageQuote();
     }
 
     private void manageClient() {
@@ -102,11 +104,11 @@ public class MainMenu {
     }
 
     private void manageMaterials() {
-        manageMaterial.manageMaterials(); // Implement this method in ManageComponents
+        manageMaterial.manageMaterials();
     }
 
     private void manageLabor() {
-      //  manageComponents.manageLabor(); // Implement this method in ManageComponents
+      manageLabor.manageLabor();
     }
 
     private void manageProjects() {

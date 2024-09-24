@@ -151,6 +151,7 @@ public class MaterialRepository implements GenericRepositoryInterface<Material> 
         ProjectRepository projectRepo = new ProjectRepository();
         Project project = projectRepo.findById(projectId).orElse(null);
 
-        return new Material(name, componentType, vatRate, project, unitCost, quantity, transportCost, qualityCoefficient);
+        return new Material(id, name, componentType, vatRate, project, unitCost, quantity, transportCost, qualityCoefficient);
+
     }
 }
