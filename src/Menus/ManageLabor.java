@@ -1,7 +1,6 @@
 package Menus;
 
 import Entities.Labor;
-import Entities.Material;
 import Entities.Project;
 import Services.LaborService;
 import Services.ProjectService;
@@ -26,18 +25,17 @@ public class ManageLabor {
 
         while (running) {
             System.out.println("\n*******************************************");
-            System.out.println("           🛠️ Gestion de Main-d'œuvre 🛠️");
+            System.out.println("            Gestion de Main-d'œuvre ");
             System.out.println("*******************************************");
-            System.out.println("1️⃣  Afficher toutes les main-d'œuvre");
-            System.out.println("2️⃣  Modifier une main-d'œuvre");
-            System.out.println("3️⃣  Supprimer une main-d'œuvre");
-            System.out.println("4️⃣  Chercher une main-d'œuvre");
-            System.out.println("5️⃣  Retourner au menu du projet");
+            System.out.println("1  Afficher toutes les main-d'œuvre");
+            System.out.println("2  Modifier une main-d'œuvre");
+            System.out.println("3  Supprimer une main-d'œuvre");
+            System.out.println("4  Chercher une main-d'œuvre");
+            System.out.println("5  Retourner au menu du projet");
             System.out.println("*******************************************");
-            System.out.print("👉 Choisissez une option : ");
+            System.out.print(" Choisissez une option : ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            int choice = getValidMenuOption(5);
 
             switch (choice) {
                 case 1:
@@ -54,10 +52,10 @@ public class ManageLabor {
                     break;
                 case 5:
                     running = false;
-                    System.out.println("🔙 Retour au menu du projet...");
+                    System.out.println("Retour au menu du projet...");
                     break;
                 default:
-                    System.out.println("❌ Option invalide. Veuillez réessayer.");
+                    System.out.println("Option invalide. Veuillez réessayer.");
                     break;
             }
         }
@@ -65,20 +63,18 @@ public class ManageLabor {
 
     private void searchLabor() {
         System.out.println("Cherchez une main-d'œuvre par :");
-        System.out.println("1️⃣  ID");
-        System.out.println("2️⃣  Nom");
-        System.out.println("3️⃣  ID du projet");
-        System.out.println("🔙  Retourner au menu principal");
+        System.out.println("1  ID");
+        System.out.println("2  Nom");
+        System.out.println("3  ID du projet");
+        System.out.println("  Retourner au menu principal");
 
-        System.out.print("👉 Choisissez une option : ");
-        int choice = scanner.nextInt();
-        scanner.nextLine();
+        System.out.print(" Choisissez une option : ");
+        int choice = getValidMenuOption(4);
 
         switch (choice) {
             case 1:
                 System.out.print("Entrez l'ID de la main-d'œuvre : ");
-                Long laborId = scanner.nextLong();
-                scanner.nextLine();
+                Long laborId = getValidLongInput();
                 Optional<Labor> laborById = laborService.findById(laborId);
                 if (laborById.isPresent()) {
                     System.out.println("Main-d'œuvre trouvée : " + laborById.get());
@@ -95,16 +91,13 @@ public class ManageLabor {
                     System.out.println("Aucune main-d'œuvre trouvée avec le nom : " + laborName);
                 } else {
                     System.out.println("Main-d'œuvre trouvées :");
-                    for (Labor labor : laborsByName) {
-                        System.out.println(labor);
-                    }
+                    laborsByName.forEach(System.out::println);
                 }
                 break;
 
             case 3:
                 System.out.print("Entrez l'ID du projet : ");
-                Long projectId = scanner.nextLong();
-                scanner.nextLine();
+                Long projectId = getValidLongInput();
                 Optional<Project> project = projectService.findById(projectId);
                 if (project.isPresent()) {
                     List<Labor> laborsByProjectId = laborService.findByProject(project.get());
@@ -112,9 +105,7 @@ public class ManageLabor {
                         System.out.println("Aucune main-d'œuvre trouvée pour le projet avec l'ID : " + projectId);
                     } else {
                         System.out.println("Main-d'œuvre trouvées pour le projet :");
-                        for (Labor labor : laborsByProjectId) {
-                            System.out.println(labor);
-                        }
+                        laborsByProjectId.forEach(System.out::println);
                     }
                 } else {
                     System.out.println("Aucun projet trouvé avec l'ID : " + projectId);
@@ -126,10 +117,11 @@ public class ManageLabor {
                 break;
 
             default:
-                System.out.println("❌ Option invalide. Veuillez réessayer.");
+                System.out.println(" Option invalide. Veuillez réessayer.");
                 break;
         }
     }
+
     public Optional<Labor> addLabor(Project project) {
         try {
             System.out.print("Entrez le type de main-d'œuvre (e.g., Ouvrier de base, Spécialiste) : ");
@@ -166,9 +158,7 @@ public class ManageLabor {
     private void displayLabor() {
         List<Labor> labors = laborService.findAll();
         System.out.println("\n--- Liste des main-d'œuvre ---");
-        for (Labor labor : labors) {
-            System.out.println(labor);
-        }
+        labors.forEach(System.out::println);
     }
 
     public Optional<List<Labor>> displayLaborByProject(Project project) {
@@ -178,19 +168,14 @@ public class ManageLabor {
             return Optional.empty();
         } else {
             System.out.println("\n--- Main-d'œuvre pour le projet : " + project.getName() + " ---");
-            for (Labor labor : labors) {
-                System.out.println(labor);
-            }
+            labors.forEach(System.out::println);
             return Optional.of(labors);
         }
     }
 
-
-
     private void updateLabor() {
         System.out.print("Entrez l'ID de la main-d'œuvre à modifier : ");
-        Long laborId = scanner.nextLong();
-        scanner.nextLine();
+        Long laborId = getValidLongInput();
 
         Optional<Labor> laborOptional = laborService.findById(laborId);
         if (laborOptional.isPresent()) {
@@ -262,8 +247,7 @@ public class ManageLabor {
 
     private void deleteLabor() {
         System.out.print("Entrez l'ID de la main-d'œuvre à supprimer : ");
-        Long id = scanner.nextLong();
-        scanner.nextLine();
+        Long id = getValidLongInput();
 
         Optional<Labor> existingLabor = laborService.findById(id);
         if (existingLabor.isPresent()) {
@@ -301,6 +285,37 @@ public class ManageLabor {
                 return Double.parseDouble(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.print("Entrée invalide. Veuillez entrer un nombre valide : ");
+            }
+        }
+    }
+
+    private Long getValidLongInput() {
+        while (true) {
+            try {
+                return Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Entrée invalide. Veuillez entrer un nombre valide : ");
+            }
+        }
+    }
+
+    private int getValidMenuOption(int maxOption) {
+        while (true) {
+            int option = getValidIntegerInput();
+            if (option >= 1 && option <= maxOption) {
+                return option;
+            } else {
+                System.out.println(" Option invalide. Veuillez choisir une option entre 1 et " + maxOption + ".");
+            }
+        }
+    }
+
+    private int getValidIntegerInput() {
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Entrée invalide. Veuillez entrer un nombre entier valide : ");
             }
         }
     }
