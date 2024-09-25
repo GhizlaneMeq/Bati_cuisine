@@ -3,6 +3,7 @@ package Menus;
 import Entities.Labor;
 import Entities.Project;
 import Services.LaborService;
+import Services.ProjectService;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,10 +11,12 @@ import java.util.Scanner;
 
 public class ManageLabor {
     private final LaborService laborService;
+    private final ProjectService projectService;
     private final Scanner scanner;
 
-    public ManageLabor(LaborService laborService) {
+    public ManageLabor(LaborService laborService, ProjectService projectService) {
         this.laborService = laborService;
+        this.projectService = projectService;
         this.scanner = new Scanner(System.in);
     }
 
@@ -22,40 +25,100 @@ public class ManageLabor {
 
         while (running) {
             System.out.println("\n*******************************************");
-            System.out.println("           🛠️ Gestion de Main-d'œuvre 🛠️");
+            System.out.println("            Gestion de Main-d'œuvre ");
             System.out.println("*******************************************");
-            System.out.println("1️⃣  Ajouter une main-d'œuvre");
-            System.out.println("2️⃣  Afficher toutes les main-d'œuvre");
-            System.out.println("3️⃣  Modifier une main-d'œuvre");
-            System.out.println("4️⃣  Supprimer une main-d'œuvre");
-            System.out.println("5️⃣  Retourner au menu du projet");
+            System.out.println("1  Afficher toutes les main-d'œuvre");
+            System.out.println("2  Modifier une main-d'œuvre");
+            System.out.println("3  Supprimer une main-d'œuvre");
+            System.out.println("4  Chercher une main-d'œuvre");
+            System.out.println("5  Retourner au menu du projet");
             System.out.println("*******************************************");
-            System.out.print("👉 Choisissez une option : ");
+            System.out.print(" Choisissez une option : ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            int choice = getValidMenuOption(5);
 
             switch (choice) {
                 case 1:
-                    addLabor(null);
+                    displayLabor();
                     break;
                 case 2:
-                    displayLabor(null);
-                    break;
-                case 3:
                     updateLabor();
                     break;
-                case 4:
+                case 3:
                     deleteLabor();
+                    break;
+                case 4:
+                    searchLabor();
                     break;
                 case 5:
                     running = false;
-                    System.out.println("🔙 Retour au menu du projet...");
+                    System.out.println("Retour au menu du projet...");
                     break;
                 default:
-                    System.out.println("❌ Option invalide. Veuillez réessayer.");
+                    System.out.println("Option invalide. Veuillez réessayer.");
                     break;
             }
+        }
+    }
+
+    private void searchLabor() {
+        System.out.println("Cherchez une main-d'œuvre par :");
+        System.out.println("1  ID");
+        System.out.println("2  Nom");
+        System.out.println("3  ID du projet");
+        System.out.println("  Retourner au menu principal");
+
+        System.out.print(" Choisissez une option : ");
+        int choice = getValidMenuOption(4);
+
+        switch (choice) {
+            case 1:
+                System.out.print("Entrez l'ID de la main-d'œuvre : ");
+                Long laborId = getValidLongInput();
+                Optional<Labor> laborById = laborService.findById(laborId);
+                if (laborById.isPresent()) {
+                    System.out.println("Main-d'œuvre trouvée : " + laborById.get());
+                } else {
+                    System.out.println("Aucune main-d'œuvre trouvée avec l'ID : " + laborId);
+                }
+                break;
+
+            case 2:
+                System.out.print("Entrez le nom de la main-d'œuvre : ");
+                String laborName = scanner.nextLine();
+                List<Labor> laborsByName = laborService.findByName(laborName);
+                if (laborsByName.isEmpty()) {
+                    System.out.println("Aucune main-d'œuvre trouvée avec le nom : " + laborName);
+                } else {
+                    System.out.println("Main-d'œuvre trouvées :");
+                    laborsByName.forEach(System.out::println);
+                }
+                break;
+
+            case 3:
+                System.out.print("Entrez l'ID du projet : ");
+                Long projectId = getValidLongInput();
+                Optional<Project> project = projectService.findById(projectId);
+                if (project.isPresent()) {
+                    List<Labor> laborsByProjectId = laborService.findByProject(project.get());
+                    if (laborsByProjectId.isEmpty()) {
+                        System.out.println("Aucune main-d'œuvre trouvée pour le projet avec l'ID : " + projectId);
+                    } else {
+                        System.out.println("Main-d'œuvre trouvées pour le projet :");
+                        laborsByProjectId.forEach(System.out::println);
+                    }
+                } else {
+                    System.out.println("Aucun projet trouvé avec l'ID : " + projectId);
+                }
+                break;
+
+            case 4:
+                System.out.println("Retour au menu principal.");
+                break;
+
+            default:
+                System.out.println(" Option invalide. Veuillez réessayer.");
+                break;
         }
     }
 
@@ -74,7 +137,7 @@ public class ManageLabor {
             double productivityFactor = getValidDoubleInput();
 
             System.out.print("Entrez le taux de TVA (en pourcentage) : ");
-            double vatRate = getValidDoubleInput() ;
+            double vatRate = getValidDoubleInput();
 
             Labor labor = new Labor(laborType, "labor", vatRate, project, hourlyRate, hoursWorked, productivityFactor);
             Optional<Labor> savedLabor = laborService.save(labor);
@@ -92,14 +155,12 @@ public class ManageLabor {
         }
     }
 
-
-    private void displayLabor(Project project) {
-        List<Labor> labors = laborService.findByProject(project);
+    private void displayLabor() {
+        List<Labor> labors = laborService.findAll();
         System.out.println("\n--- Liste des main-d'œuvre ---");
-        for (Labor labor : labors) {
-            System.out.println(labor);
-        }
+        labors.forEach(System.out::println);
     }
+
     public Optional<List<Labor>> displayLaborByProject(Project project) {
         List<Labor> labors = laborService.findByProject(project);
         if (labors.isEmpty()) {
@@ -107,64 +168,115 @@ public class ManageLabor {
             return Optional.empty();
         } else {
             System.out.println("\n--- Main-d'œuvre pour le projet : " + project.getName() + " ---");
-            for (Labor labor : labors) {
-                System.out.println(labor);
-            }
+            labors.forEach(System.out::println);
             return Optional.of(labors);
         }
     }
 
     private void updateLabor() {
         System.out.print("Entrez l'ID de la main-d'œuvre à modifier : ");
-        Long laborId = scanner.nextLong();
-        scanner.nextLine();
+        Long laborId = getValidLongInput();
 
         Optional<Labor> laborOptional = laborService.findById(laborId);
         if (laborOptional.isPresent()) {
             Labor labor = laborOptional.get();
             System.out.println("Main-d'œuvre trouvée : " + labor);
 
-            System.out.print("Nouveau type de main-d'œuvre (laisser vide pour ne pas modifier) : ");
-            String newName = scanner.nextLine();
-            if (!newName.isEmpty()) {
-                labor.setName(newName);
-            }
+            System.out.println("Entrez les nouvelles informations pour cette main-d'œuvre (laisser vide pour garder les valeurs actuelles) :");
+            updateLaborDetails(labor);
 
-            System.out.print("Nouveau taux horaire (laisser vide pour ne pas modifier) : ");
-            String newRateInput = scanner.nextLine();
-            if (!newRateInput.isEmpty()) {
-                labor.setHourlyRate(Double.parseDouble(newRateInput));
+            Optional<Labor> updatedLabor = laborService.update(labor);
+            if (updatedLabor.isPresent()) {
+                System.out.println("Main-d'œuvre mise à jour avec succès !");
+                updateProjectCosts(labor.getProject());
+            } else {
+                System.out.println("Erreur lors de la mise à jour de la main-d'œuvre.");
             }
-
-            System.out.print("Nouveau nombre d'heures travaillées (laisser vide pour ne pas modifier) : ");
-            String newHoursInput = scanner.nextLine();
-            if (!newHoursInput.isEmpty()) {
-                labor.setHoursWorked(Double.parseDouble(newHoursInput));
-            }
-
-            System.out.print("Nouveau facteur de productivité (laisser vide pour ne pas modifier) : ");
-            String newProductivityInput = scanner.nextLine();
-            if (!newProductivityInput.isEmpty()) {
-                labor.setWorkerProductivity(Double.parseDouble(newProductivityInput));
-            }
-
-            laborService.update(labor);
-            System.out.println("Main-d'œuvre mise à jour avec succès !");
         } else {
             System.out.println("Aucune main-d'œuvre trouvée avec l'ID : " + laborId);
         }
     }
 
+    private void updateLaborDetails(Labor labor) {
+        System.out.print("Nouveau type de main-d'œuvre (actuel : " + labor.getName() + ", laisser vide pour ne pas modifier) : ");
+        String newName = scanner.nextLine();
+        if (!newName.isEmpty()) {
+            labor.setName(newName);
+        }
+
+        System.out.print("Nouveau taux horaire (actuel : " + labor.getHourlyRate() + ", laisser vide pour ne pas modifier) : ");
+        String newRateInput = scanner.nextLine();
+        if (!newRateInput.isEmpty()) {
+            try {
+                labor.setHourlyRate(Double.parseDouble(newRateInput));
+            } catch (NumberFormatException e) {
+                System.out.println("Taux horaire invalide, gardant la valeur actuelle.");
+            }
+        }
+
+        System.out.print("Nouveau nombre d'heures travaillées (actuel : " + labor.getHoursWorked() + ", laisser vide pour ne pas modifier) : ");
+        String newHoursInput = scanner.nextLine();
+        if (!newHoursInput.isEmpty()) {
+            try {
+                labor.setHoursWorked(Double.parseDouble(newHoursInput));
+            } catch (NumberFormatException e) {
+                System.out.println("Nombre d'heures invalide, gardant la valeur actuelle.");
+            }
+        }
+
+        System.out.print("Nouveau facteur de productivité (actuel : " + labor.getWorkerProductivity() + ", laisser vide pour ne pas modifier) : ");
+        String newProductivityInput = scanner.nextLine();
+        if (!newProductivityInput.isEmpty()) {
+            try {
+                labor.setWorkerProductivity(Double.parseDouble(newProductivityInput));
+            } catch (NumberFormatException e) {
+                System.out.println("Facteur de productivité invalide, gardant la valeur actuelle.");
+            }
+        }
+
+        System.out.print("Nouveau taux de TVA (actuel : " + labor.getVatRate() + ", laisser vide pour ne pas modifier) : ");
+        String newVatRateInput = scanner.nextLine();
+        if (!newVatRateInput.isEmpty()) {
+            try {
+                labor.setVatRate(Double.parseDouble(newVatRateInput));
+            } catch (NumberFormatException e) {
+                System.out.println("Taux de TVA invalide, gardant la valeur actuelle.");
+            }
+        }
+    }
+
     private void deleteLabor() {
         System.out.print("Entrez l'ID de la main-d'œuvre à supprimer : ");
-        Long laborId = scanner.nextLong();
-        scanner.nextLine();
+        Long id = getValidLongInput();
 
-        if (laborService.delete(laborId)) {
-            System.out.println("Main-d'œuvre supprimée avec succès !");
+        Optional<Labor> existingLabor = laborService.findById(id);
+        if (existingLabor.isPresent()) {
+            System.out.print("Êtes-vous sûr de vouloir supprimer cette main-d'œuvre ? (oui/non) : ");
+            String confirmation = scanner.nextLine();
+            if (!confirmation.equalsIgnoreCase("oui")) {
+                System.out.println("Suppression annulée.");
+                return;
+            }
+
+            Project project = existingLabor.get().getProject();
+
+            if (laborService.delete(id)) {
+                System.out.println("Main-d'œuvre supprimée avec succès !");
+                updateProjectCosts(project);
+            } else {
+                System.out.println("Erreur lors de la suppression de la main-d'œuvre.");
+            }
         } else {
-            System.out.println("Aucune main-d'œuvre trouvée avec l'ID : " + laborId);
+            System.out.println("Aucune main-d'œuvre trouvée avec l'ID : " + id);
         }
+    }
+
+    private void updateProjectCosts(Project project) {
+        double[] newTotalCost = projectService.calculateTotalCost(project, project.getProfitMargin());
+        project.setTotalCost(newTotalCost[1]);
+        projectService.update(project);
+
+        System.out.printf("Coût total du projet mis à jour : %.2f €\n", newTotalCost[1]);
     }
 
     private double getValidDoubleInput() {
@@ -173,6 +285,37 @@ public class ManageLabor {
                 return Double.parseDouble(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.print("Entrée invalide. Veuillez entrer un nombre valide : ");
+            }
+        }
+    }
+
+    private Long getValidLongInput() {
+        while (true) {
+            try {
+                return Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Entrée invalide. Veuillez entrer un nombre valide : ");
+            }
+        }
+    }
+
+    private int getValidMenuOption(int maxOption) {
+        while (true) {
+            int option = getValidIntegerInput();
+            if (option >= 1 && option <= maxOption) {
+                return option;
+            } else {
+                System.out.println(" Option invalide. Veuillez choisir une option entre 1 et " + maxOption + ".");
+            }
+        }
+    }
+
+    private int getValidIntegerInput() {
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Entrée invalide. Veuillez entrer un nombre entier valide : ");
             }
         }
     }

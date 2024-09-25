@@ -1,7 +1,5 @@
 package Services;
 
-import Entities.Labor;
-import Entities.Material;
 import Entities.Project;
 import Repositories.ProjectRepository;
 
@@ -74,9 +72,13 @@ public class ProjectService {
         double totalMargin = totalCostWithVAT * marginRate;
 
         double finalTotalCost = totalCostWithVAT + totalMargin;
-        System.out.println("withTva"+totalCostWithVAT);
-        System.out.println("withmargin"+totalMargin);
-        System.out.println("cout total"+finalTotalCost);
+
+        if (project.getClient().isProfessional()) {
+            finalTotalCost *= 0.9;
+        }
+        System.out.printf("3. Coût total avant marge : %.2f €%n", totalCostWithVAT);
+        System.out.printf("4. Marge bénéficiaire (%.0f%%) : %.2f €%n", marginRate * 100, totalMargin);
+        System.out.printf("**Coût total final du projet : %.2f €**%n", finalTotalCost);
         return new double[]{totalCostBeforeVAT, totalCostWithVAT, totalMargin, finalTotalCost};
     }
 

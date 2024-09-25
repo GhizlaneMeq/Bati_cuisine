@@ -1,7 +1,6 @@
 package Entities;
 
 public class Material extends Component {
-    private long id;
     private double unitCost;
     private double quantity;
     private double transportCost;
@@ -15,22 +14,12 @@ public class Material extends Component {
         this.qualityCoefficient = qualityCoefficient;
     }
 
-
     public Material(Long id, String name, String componentType, double vatRate, Project project, double unitCost, double quantity, double transportCost, double qualityCoefficient) {
         super(id, name, componentType, vatRate, project);
         this.unitCost = unitCost;
         this.quantity = quantity;
         this.transportCost = transportCost;
         this.qualityCoefficient = qualityCoefficient;
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public double getUnitCost() {
@@ -68,8 +57,7 @@ public class Material extends Component {
     @Override
     public String toString() {
         return super.toString() + "Material{" +
-                "id=" + id +
-                ", unitCost=" + unitCost +
+                "unitCost=" + unitCost +
                 ", quantity=" + quantity +
                 ", transportCost=" + transportCost +
                 ", qualityCoefficient=" + qualityCoefficient +

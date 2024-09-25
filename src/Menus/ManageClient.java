@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.Scanner;
 
 public class ManageClient {
-    private ClientService clientService;
-    private Scanner scanner;
+    private final ClientService clientService;
+    private final Scanner scanner;
 
     public ManageClient(ClientService clientService) {
         this.clientService = clientService;
@@ -22,19 +22,18 @@ public class ManageClient {
 
         while (running) {
             System.out.println("\n*******************************************");
-            System.out.println("           🧑‍🤝‍🧑 Gestion des Clients 🧑‍🤝‍🧑");
+            System.out.println("            Gestion des Clients ");
             System.out.println("*******************************************");
-            System.out.println("1️⃣  Ajouter un nouveau client");
-            System.out.println("2️⃣  Chercher un client existant");
-            System.out.println("3️⃣  Modifier un client");
-            System.out.println("4️⃣  Supprimer un client");
-            System.out.println("5️⃣  Afficher tous les clients");
-            System.out.println("6️⃣  Retourner au menu principal");
+            System.out.println("1  Ajouter un nouveau client");
+            System.out.println("2  Chercher un client existant");
+            System.out.println("3  Modifier un client");
+            System.out.println("4  Supprimer un client");
+            System.out.println("5  Afficher tous les clients");
+            System.out.println("6  Retourner au menu principal");
             System.out.println("*******************************************");
-            System.out.print("👉 Choisissez une option : ");
+            System.out.print(" Choisissez une option : ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            int choice = getValidMenuOption(6);
 
             switch (choice) {
                 case 1:
@@ -54,10 +53,10 @@ public class ManageClient {
                     break;
                 case 6:
                     running = false;
-                    System.out.println("🔙 Retour au menu principal...");
+                    System.out.println(" Retour au menu principal...");
                     break;
                 default:
-                    System.out.println("❌ Option invalide. Veuillez réessayer.");
+                    System.out.println(" Option invalide. Veuillez réessayer.");
                     break;
             }
         }
@@ -65,30 +64,17 @@ public class ManageClient {
 
     public Optional<Client> addNewClient() {
         System.out.println("--- Ajouter un nouveau client ---");
+
         System.out.print("Entrez le nom du client : ");
         String name = scanner.nextLine();
+
         System.out.print("Entrez l'adresse du client : ");
         String address = scanner.nextLine();
+
         System.out.print("Entrez le numéro de téléphone du client : ");
         String phoneNumber = scanner.nextLine();
 
-        boolean status = false;
-        boolean validInput = false;
-
-        while (!validInput) {
-            System.out.print("Le client est-il professionnel ? (oui/non) : ");
-            String input = scanner.nextLine().trim().toLowerCase();
-
-            if (input.equals("oui")) {
-                status = true;
-                validInput = true;
-            } else if (input.equals("non")) {
-                status = false;
-                validInput = true;
-            } else {
-                System.out.println("❌ Entrée invalide. Veuillez entrer 'oui' ou 'non'.");
-            }
-        }
+        boolean status = getClientStatus();
 
         Client client = new Client(name, address, phoneNumber, status);
 
@@ -108,6 +94,20 @@ public class ManageClient {
         }
     }
 
+    private boolean getClientStatus() {
+        while (true) {
+            System.out.print("Le client est-il professionnel ? (oui/non) : ");
+            String input = scanner.nextLine().trim().toLowerCase();
+
+            if (input.equals("oui")) {
+                return true;
+            } else if (input.equals("non")) {
+                return false;
+            } else {
+                System.out.println(" Entrée invalide. Veuillez entrer 'oui' ou 'non'.");
+            }
+        }
+    }
 
     public Optional<Client> searchClient() {
         System.out.print("Entrez le nom du client à rechercher : ");
@@ -128,7 +128,6 @@ public class ManageClient {
         }
     }
 
-
     private void modifyClient() {
         System.out.print("Entrez le nom du client à modifier : ");
         String name = scanner.nextLine();
@@ -142,28 +141,7 @@ public class ManageClient {
             String confirm = scanner.nextLine().trim().toLowerCase();
 
             if (confirm.equals("y")) {
-                System.out.print("Modifier le nom (actuel : " + client.getName() + ") : ");
-                String newName = scanner.nextLine();
-                if (!newName.trim().isEmpty()) {
-                    client.setName(newName);
-                }
-
-                System.out.print("Modifier l'adresse (actuelle : " + client.getAddress() + ") : ");
-                String newAddress = scanner.nextLine();
-                if (!newAddress.trim().isEmpty()) {
-                    client.setAddress(newAddress);
-                }
-
-                System.out.print("Modifier le téléphone (actuel : " + client.getPhone() + ") : ");
-                String newPhone = scanner.nextLine();
-                if (!newPhone.trim().isEmpty()) {
-                    client.setPhone(newPhone);
-                }
-
-                System.out.print("Le client est-il professionnel (actuel : " + (client.isProfessional() ? "Oui" : "Non") + ") ? (oui/non) : ");
-                String statusInput = scanner.nextLine().trim().toLowerCase();
-                client.setProfessional(statusInput.equals("oui"));
-
+                updateClientDetails(client);
                 clientService.update(client);
                 System.out.println("Client mis à jour avec succès !");
             } else {
@@ -171,6 +149,34 @@ public class ManageClient {
             }
         } else {
             System.out.println("Aucun client trouvé avec le nom : " + name);
+        }
+    }
+
+    private void updateClientDetails(Client client) {
+        System.out.print("Modifier le nom (actuel : " + client.getName() + ") : ");
+        String newName = scanner.nextLine();
+        if (!newName.trim().isEmpty()) {
+            client.setName(newName);
+        }
+
+        System.out.print("Modifier l'adresse (actuelle : " + client.getAddress() + ") : ");
+        String newAddress = scanner.nextLine();
+        if (!newAddress.trim().isEmpty()) {
+            client.setAddress(newAddress);
+        }
+
+        System.out.print("Modifier le téléphone (actuel : " + client.getPhone() + ") : ");
+        String newPhone = scanner.nextLine();
+        if (!newPhone.trim().isEmpty()) {
+            client.setPhone(newPhone);
+        }
+
+        System.out.print("Le client est-il professionnel (actuel : " + (client.isProfessional() ? "Oui" : "Non") + ") ? (oui/non) : ");
+        String statusInput = scanner.nextLine().trim().toLowerCase();
+        if (statusInput.equals("oui")) {
+            client.setProfessional(true);
+        } else if (statusInput.equals("non")) {
+            client.setProfessional(false);
         }
     }
 
@@ -196,8 +202,8 @@ public class ManageClient {
 
     private void displayClients() {
         List<Client> clients = clientService.findAll();
-
         System.out.println("\n--- Liste des clients ---");
+
         for (Client client : clients) {
             System.out.printf("Nom: %s, Adresse: %s, Téléphone: %s, Professionnel: %s\n",
                     client.getName(), client.getAddress(), client.getPhone(),
@@ -208,9 +214,28 @@ public class ManageClient {
                 System.out.println("  Aucun projet assigné.");
             } else {
                 System.out.println("  Projets assignés :");
-                for (Project project : projects) {
-                    System.out.println("  - " + project.getName());
-                }
+                projects.forEach(project -> System.out.println("  - " + project.getName()));
+            }
+        }
+    }
+
+    private int getValidMenuOption(int maxOption) {
+        while (true) {
+            int option = getValidIntegerInput();
+            if (option >= 1 && option <= maxOption) {
+                return option;
+            } else {
+                System.out.println(" Option invalide. Veuillez choisir une option entre 1 et " + maxOption + ".");
+            }
+        }
+    }
+
+    private int getValidIntegerInput() {
+        while (true) {
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Entrée invalide. Veuillez entrer un nombre entier valide : ");
             }
         }
     }

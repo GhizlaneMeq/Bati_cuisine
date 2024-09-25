@@ -26,25 +26,24 @@ public class ManageMaterial {
 
         while (running) {
             System.out.println("\n*******************************************");
-            System.out.println("           🏗️ Gestion des Matériaux 🏗️");
+            System.out.println("            Gestion des Matériaux ");
             System.out.println("*******************************************");
-            System.out.println("1️⃣  Chercher un matériau existant");
-            System.out.println("2️⃣  Modifier un matériau");
-            System.out.println("3️⃣  Supprimer un matériau");
-            System.out.println("4️⃣  Afficher tous les matériaux");
-            System.out.println("5️⃣  Retourner au menu principal");
+            System.out.println("1  Chercher un matériau existant");
+            System.out.println("2  Modifier un matériau");
+            System.out.println("3  Supprimer un matériau");
+            System.out.println("4  Afficher tous les matériaux");
+            System.out.println("5  Retourner au menu principal");
             System.out.println("*******************************************");
-            System.out.print("👉 Choisissez une option : ");
+            System.out.print(" Choisissez une option : ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+            int choice = getValidMenuOption(5);
 
             switch (choice) {
                 case 1:
                     searchMaterial();
                     break;
                 case 2:
-                    modifyMaterial();
+                    updateMaterial();
                     break;
                 case 3:
                     deleteMaterial();
@@ -54,19 +53,76 @@ public class ManageMaterial {
                     break;
                 case 5:
                     running = false;
-                    System.out.println("🔙 Retour au menu principal...");
-                    break;
-                default:
-                    System.out.println("❌ Option invalide. Veuillez réessayer.");
+                    System.out.println(" Retour au menu principal...");
                     break;
             }
         }
     }
 
     private void searchMaterial() {
+        System.out.println("Cherchez un matériau par :");
+        System.out.println("1  ID");
+        System.out.println("2  Nom");
+        System.out.println("3  ID du projet");
+        System.out.println(" Retourner au menu principal");
+
+        System.out.print(" Choisissez une option : ");
+        int choice = getValidMenuOption(3);
+
+        switch (choice) {
+            case 1:
+                System.out.print("Entrez l'ID du matériau : ");
+                Long id = getValidLongInput();
+                Optional<Material> materialById = materialService.findById(id);
+                if (materialById.isPresent()) {
+                    System.out.println("Matériau trouvé : " + materialById.get());
+                } else {
+                    System.out.println("Aucun matériau trouvé avec l'ID : " + id);
+                }
+                break;
+
+            case 2:
+                System.out.print("Entrez le nom du matériau : ");
+                String name = scanner.nextLine();
+                List<Material> materialsByName = materialService.findByName(name);
+                if (materialsByName.isEmpty()) {
+                    System.out.println("Aucun matériau trouvé avec le nom : " + name);
+                } else {
+                    System.out.println("Matériaux trouvés :");
+                    for (Material material : materialsByName) {
+                        System.out.println(material);
+                    }
+                }
+                break;
+
+            case 3:
+                System.out.print("Entrez l'ID du projet : ");
+                Long projectId = getValidLongInput();
+                Optional<Project> project = projectService.findById(projectId);
+                if (project.isPresent()) {
+                    List<Material> materialsByProjectId = materialService.findByProject(project.get());
+                    if (materialsByProjectId.isEmpty()) {
+                        System.out.println("Aucun matériau trouvé pour le projet avec l'ID : " + projectId);
+                    } else {
+                        System.out.println("Matériaux trouvés pour le projet :");
+                        for (Material material : materialsByProjectId) {
+                            System.out.println(material);
+                        }
+                    }
+                } else {
+                    System.out.println("Aucun projet trouvé avec l'ID : " + projectId);
+                }
+                break;
+
+            case 4:
+                System.out.println("Retour au menu principal.");
+                break;
+
+            default:
+                System.out.println(" Option invalide. Veuillez réessayer.");
+                break;
+        }
     }
-
-
 
     public Optional<List<Material>> displayMaterialsByProject(Project project) {
         List<Material> materials = materialService.findByProject(project);
@@ -87,17 +143,15 @@ public class ManageMaterial {
         System.out.print("Entrez le nom du matériau : ");
         String name = scanner.nextLine();
         System.out.print("Entrez la quantité de ce matériau (en m²) : ");
-        double quantity = scanner.nextDouble();
+        double quantity = getValidDoubleInput();
         System.out.print("Entrez le coût unitaire de ce matériau (€/m²) : ");
-        double unitCost = scanner.nextDouble();
+        double unitCost = getValidDoubleInput();
         System.out.print("Entrez le coût de transport de ce matériau (€) : ");
-        double transportCost = scanner.nextDouble();
+        double transportCost = getValidDoubleInput();
         System.out.print("Entrez le taux de TVA : ");
-        double vatRate = scanner.nextDouble();
-        scanner.nextLine();
-        System.out.print("Entrez le coefficient de qualité du matériau (1.0 = standard, > 1.0 = haute qualité) : 1.1\n : ");
+        double vatRate = getValidDoubleInput();
+        System.out.print("Entrez le coefficient de qualité du matériau (1.0 = standard, > 1.0 = haute qualité) : ");
         double qualityCoefficient = getValidDoubleInput();
-        scanner.nextLine();
 
         Material material = new Material(name, "material", vatRate, project, unitCost, quantity, transportCost, qualityCoefficient);
 
@@ -112,28 +166,86 @@ public class ManageMaterial {
         return savedMaterial;
     }
 
-
-
-    private void modifyMaterial() {
-        System.out.print("Entrez l'ID du matériau à modifier : ");
-        Long id = scanner.nextLong();
-        scanner.nextLine();
+    private void updateMaterial() {
+        System.out.print("Entrez l'ID du matériau à mettre à jour : ");
+        Long id = getValidLongInput();
 
         Optional<Material> existingMaterial = materialService.findById(id);
         if (existingMaterial.isPresent()) {
             Material material = existingMaterial.get();
-            System.out.println("Matériau trouvé : " + material);
+            System.out.println("Matériau actuel -------------------------: " + material.getId());
 
-            System.out.print("Êtes-vous sûr de vouloir modifier ce matériau ? (oui/non) : ");
-            String confirmation = scanner.nextLine();
-            if (!confirmation.equalsIgnoreCase("oui")) {
-                System.out.println("Modification annulée.");
-                return;
+            System.out.println("Entrez les nouvelles informations pour ce matériau (laisser vide pour garder les valeurs actuelles) :");
+
+            System.out.print("Nouveau nom (actuel : " + material.getName() + ") : ");
+            String name = scanner.nextLine();
+            if (!name.isEmpty()) {
+                material.setName(name);
             }
 
-            materialService.update(material);
-            System.out.println("Matériau mis à jour avec succès !");
-            updateProjectCosts(material.getProject());
+            System.out.print("Nouvelle quantité (actuel : " + material.getQuantity() + ") : ");
+            String quantityInput = scanner.nextLine();
+            if (!quantityInput.isEmpty()) {
+                try {
+                    material.setQuantity(Double.parseDouble(quantityInput));
+                } catch (NumberFormatException e) {
+                    System.out.println("Quantité invalide, gardant la valeur actuelle.");
+                }
+            }
+
+            System.out.print("Nouveau coût unitaire (actuel : " + material.getUnitCost() + ") : ");
+            String unitCostInput = scanner.nextLine();
+            if (!unitCostInput.isEmpty()) {
+                try {
+                    material.setUnitCost(Double.parseDouble(unitCostInput));
+                } catch (NumberFormatException e) {
+                    System.out.println("Coût unitaire invalide, gardant la valeur actuelle.");
+                }
+            }
+
+            System.out.print("Nouveau coût de transport (actuel : " + material.getTransportCost() + ") : ");
+            String transportCostInput = scanner.nextLine();
+            if (!transportCostInput.isEmpty()) {
+                try {
+                    material.setTransportCost(Double.parseDouble(transportCostInput));
+                } catch (NumberFormatException e) {
+                    System.out.println("Coût de transport invalide, gardant la valeur actuelle.");
+                }
+            }
+
+            System.out.print("Nouveau taux de TVA (actuel : " + material.getVatRate() + ") : ");
+            String vatRateInput = scanner.nextLine();
+            if (!vatRateInput.isEmpty()) {
+                try {
+                    material.setVatRate(Double.parseDouble(vatRateInput));
+                } catch (NumberFormatException e) {
+                    System.out.println("Taux de TVA invalide, gardant la valeur actuelle.");
+                }
+            }
+
+            System.out.print("Nouveau coefficient de qualité (actuel : " + material.getQualityCoefficient() + ") : ");
+            String qualityCoefficientInput = scanner.nextLine();
+            if (!qualityCoefficientInput.isEmpty()) {
+                try {
+                    material.setQualityCoefficient(Double.parseDouble(qualityCoefficientInput));
+                } catch (NumberFormatException e) {
+                    System.out.println("Coefficient de qualité invalide, gardant la valeur actuelle.");
+                }
+            }
+
+            System.out.print("Êtes-vous sûr de vouloir enregistrer ces modifications ? (oui/non) : ");
+            String confirmation = scanner.nextLine();
+            if (confirmation.equalsIgnoreCase("oui")) {
+                Optional<Material> updatedMaterial = materialService.update(material);
+                if (updatedMaterial.isPresent()) {
+                    System.out.println("Matériau mis à jour avec succès !");
+                    updateProjectCosts(material.getProject());
+                } else {
+                    System.out.println("Erreur lors de la mise à jour du matériau.");
+                }
+            } else {
+                System.out.println("Modification annulée.");
+            }
         } else {
             System.out.println("Aucun matériau trouvé avec l'ID : " + id);
         }
@@ -141,8 +253,7 @@ public class ManageMaterial {
 
     private void deleteMaterial() {
         System.out.print("Entrez l'ID du matériau à supprimer : ");
-        Long id = scanner.nextLong();
-        scanner.nextLine();
+        Long id = getValidLongInput();
 
         Optional<Material> existingMaterial = materialService.findById(id);
         if (existingMaterial.isPresent()) {
@@ -173,25 +284,41 @@ public class ManageMaterial {
     }
 
     private void updateProjectCosts(Project project) {
-        double[] newTotalCost = projectService.calculateTotalCost(project,project.getProfitMargin());
-        System.out.println("jhgfdsdfghjk"+project);
-        projectService.update(new Project(project.getId(), project.getName(), newTotalCost[3], project.getProjectStatus(), project.getClient()));
+        double[] newTotalCost = projectService.calculateTotalCost(project, project.getProfitMargin());
+        project.setTotalCost(newTotalCost[1]);
+        projectService.update(project);
 
-        System.out.printf("Coût total du projet mis à jour : %.2f €\n", newTotalCost[3]);
+        System.out.printf("Coût total du projet mis à jour : %.2f €\n", newTotalCost[1]);
     }
-
-
-
 
     private double getValidDoubleInput() {
         while (true) {
             try {
                 return Double.parseDouble(scanner.nextLine());
             } catch (NumberFormatException e) {
-                System.out.print("Entrée invalide. Veuillez entrer un nombre valide: ");
+                System.out.print("Entrée invalide. Veuillez entrer un nombre valide : ");
             }
         }
     }
 
+    private long getValidLongInput() {
+        while (true) {
+            try {
+                return Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.print("Entrée invalide. Veuillez entrer un nombre valide : ");
+            }
+        }
+    }
 
+    private int getValidMenuOption(int maxOption) {
+        while (true) {
+            int option = (int) getValidLongInput();
+            if (option >= 1 && option <= maxOption) {
+                return option;
+            } else {
+                System.out.print("Option invalide. Veuillez choisir une option entre 1 et " + maxOption + " : ");
+            }
+        }
+    }
 }
