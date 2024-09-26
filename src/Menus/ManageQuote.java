@@ -121,10 +121,10 @@ public class ManageQuote {
     private void displayAllQuotes() {
         List<Quote> quotes = quoteService.findAll();
         System.out.println("\n--- Liste des devis ---");
-        for (Quote quote : quotes) {
-            System.out.println(quote);
-        }
+        quotes.stream()
+                .forEach(System.out::println);
     }
+
 
     private void editQuote() {
         Long quoteId = promptForLong("Entrez l'ID du devis à modifier : ");
